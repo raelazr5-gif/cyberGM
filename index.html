@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CyberGuard RPG — Cyber Investigator Training</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/main.css">
+<link rel="stylesheet" href="css/duel-arena.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     BOOT SCREEN
+══════════════════════════════════════ -->
+<div class="screen active" id="boot">
+  <div class="boot-logo">CYBERGUARD</div>
+  <div class="boot-sub">RPG INVESTIGATOR EDITION v2.4.1</div>
+  <div class="boot-terminal" id="boot-terminal">
+    <span id="boot-text"></span><span class="boot-cursor" id="boot-cursor"></span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="login">
+  <div class="login-box">
+    <div class="login-title">// SYSTEM ACCESS</div>
+    <div class="login-subtitle">CyberGuard Investigator Training Platform</div>
+    <div class="tab-row">
+      <button class="tab-btn active" onclick="switchTab('login-form','register-form',this)">LOGIN</button>
+      <button class="tab-btn" onclick="switchTab('register-form','login-form',this)">REGISTER</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="field-group">
+        <label class="field-label">AGENT ID</label>
+        <input class="field-input" id="login-name" type="text" placeholder="Masukkan nama agent (min 4 karakter, tidak hanya angka)" maxlength="20">
+        <div style="margin-top:6px;font-size:12px;color:var(--text2);">Nama agent harus minimal 4 karakter dan tidak boleh hanya angka.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">AGENT AVATAR</label>
+        <div class="avatar-row" id="login-avatar-row">
+          <div class="avatar-opt sel" title="Detektif Siber" onclick="selectAvatar(this,'🕵️')">🕵️</div>
+          <div class="avatar-opt" title="Spesialis Keamanan" onclick="selectAvatar(this,'👩‍💻')">👩‍💻</div>
+          <div class="avatar-opt" title="Penipu Siber" onclick="selectAvatar(this,'🦾')">🦾</div>
+          <div class="avatar-opt" title="Rogue AI" onclick="selectAvatar(this,'🤖')">🤖</div>
+          <div class="avatar-opt" title="Shadow Hacker" onclick="selectAvatar(this,'🥷')">🥷</div>
+        </div>
+      </div>
+      <button class="btn btn-cyan btn-full" onclick="doLogin()" style="margin-top:8px;">
+        [ INITIATE LOGIN ]
+      </button>
+      <div style="margin-top:12px;font-size:11px;color:var(--text2);text-align:center;">
+        Masukkan username terdaftar. Jika belum punya akun, daftar dulu.
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" style="display:none;">
+      <div class="field-group">
+        <label class="field-label">USERNAME</label>
+        <input class="field-input" id="reg-username" type="text" placeholder="Pilih username (min 4 karakter, tidak hanya angka)" maxlength="20">
+        <div style="margin-top:6px;font-size:12px;color:var(--text2);">Username harus minimal 4 karakter dan tidak boleh hanya angka.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">FULL NAME</label>
+        <input class="field-input" id="reg-fullname" type="text" placeholder="Masukkan nama lengkap" maxlength="50">
+        <div style="margin-top:6px;font-size:12px;color:var(--text2);">Nama lengkap diperlukan untuk profil Anda.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">EMAIL</label>
+        <input class="field-input" id="reg-email" type="email" placeholder="Masukkan email Anda">
+        <div style="margin-top:6px;font-size:12px;color:var(--text2);">Email akan digunakan sebagai ID akun. Local part minimal 4 karakter dan format harus valid.</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">PILIH AVATAR</label>
+        <div class="avatar-row" id="reg-avatar-row">
+          <div class="avatar-opt sel" title="Detektif Siber" onclick="selectAvatar2(this,'🕵️')">🕵️</div>
+          <div class="avatar-opt" title="Spesialis Keamanan" onclick="selectAvatar2(this,'👩‍💻')">👩‍💻</div>
+          <div class="avatar-opt" title="Penipu Siber" onclick="selectAvatar2(this,'🦾')">🦾</div>
+          <div class="avatar-opt" title="Rogue AI" onclick="selectAvatar2(this,'🤖')">🤖</div>
+          <div class="avatar-opt" title="Shadow Hacker" onclick="selectAvatar2(this,'🥷')">🥷</div>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">SPESIALISASI AWAL</label>
+        <select class="field-input" id="reg-spec">
+          <option value="analyst">🔬 Analyst — Akurasi tinggi</option>
+          <option value="detective">🔍 Detective — Petunjuk lebih banyak</option>
+          <option value="hacker">⚡ Hacker — Kecepatan respons</option>
+        </select>
+      </div>
+      <button class="btn btn-green btn-full" onclick="doRegister()" style="margin-top:8px;">
+        [ CREATE AGENT ]
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     HUB SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="hub">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="player-card">
+      <div class="player-avatar-big" id="sb-avatar">🕵️</div>
+      <div class="player-name-hud" id="sb-name">AGENT</div>
+      <div class="player-rank" id="sb-rank">Rookie Investigator</div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-label"><span>EXP</span><span id="sb-exp">0/100</span></div>
+        <div class="bar-track"><div class="bar-fill xp-fill" id="sb-xp-bar" style="width:0%"></div></div>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-label"><span>HP</span><span id="sb-hp">100/100</span></div>
+        <div class="bar-track"><div class="bar-fill hp-fill-bar" id="sb-hp-bar" style="width:100%"></div></div>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar-label"><span>STAMINA</span><span id="sb-sta">100/100</span></div>
+        <div class="bar-track"><div class="bar-fill sta-fill-bar" id="sb-sta-bar" style="width:100%"></div></div>
+      </div>
+    </div>
+    <nav class="nav-menu">
+      <div class="nav-item active" onclick="showPanel('panel-map',this)"><span class="nav-icon">🗺️</span>CITY MAP</div>
+      <div class="nav-item" onclick="showPanel('panel-missions',this)"><span class="nav-icon">📋</span>MISSIONS<span class="nav-badge" id="mission-badge">5</span></div>
+      <div class="nav-item" onclick="openBattleArena()"><span class="nav-icon">⚔️</span>DUEL ARENA</div>
+      <div class="nav-item" onclick="showPanel('panel-skills',this)"><span class="nav-icon">🌳</span>SKILL TREE</div>
+      <div class="nav-item" onclick="showPanel('panel-inventory',this)"><span class="nav-icon">🎒</span>INVENTORY</div>
+      <div class="nav-item" onclick="showPanel('panel-shop',this)"><span class="nav-icon">🏪</span>SHOP</div>
+      <div class="nav-item" onclick="showPanel('panel-stats',this)"><span class="nav-icon">📊</span>RESEARCH DATA</div>
+      <div class="nav-item" onclick="showPanel('panel-achievements',this)"><span class="nav-icon">🏆</span>ACHIEVEMENTS</div>
+      <div class="nav-item" onclick="showPanel('panel-leaderboard',this)"><span class="nav-icon">🥇</span>LEADERBOARD</div>
+      <div class="nav-item" onclick="showPanel('panel-npcs',this);renderNpcPanel()"><span class="nav-icon">🧑‍🤝‍🧑</span>NPC CONTACTS</div>
+    </nav>
+    <div class="credits-bar">💰 <span id="sb-credits">500</span> CR</div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;">
+    <div class="topbar">
+      <div class="topbar-title">// CYBERGUARD COMMAND CENTER</div>
+      <div class="status-dot"></div>
+      <span style="font-size:10px;">SYSTEM ONLINE</span>
+      <span style="font-size:10px;color:var(--text2);">|</span>
+      <span style="font-size:10px;" id="topbar-time">--:--</span>
+      <span style="font-size:10px;color:var(--text2);">|</span>
+      <span style="font-size:10px;">LVL <span id="topbar-level" class="text-cyan">1</span></span>
+      <span style="font-size:10px;color:var(--text2);">|</span>
+      <span style="font-size:9px;letter-spacing:1px;" id="server-status">SERVER …</span>
+      <button class="btn btn-sm" onclick="doLogout()" style="margin-left:auto;border-color:var(--border2);color:var(--text2);">LOGOUT</button>
+    </div>
+    <div class="main-content pixel-bg">
+
+      <!-- MAP PANEL -->
+      <div class="panel active" id="panel-map">
+        <div class="ava-strip" onclick="openAvaPanel()">
+          <div class="ava-avatar">🤖</div>
+          <div class="ava-text">
+            <div class="ava-name">AVA — Adaptive Virtual Assistant</div>
+            <div class="ava-msg" id="ava-hub-msg">Selamat datang kembali, Agent. Siap memulai investigasi?</div>
+          </div>
+          <div style="font-size:11px;color:var(--purple);">[ CHAT ]</div>
+        </div>
+
+        <div class="quick-stats">
+          <div class="qs-box">
+            <div class="qs-val text-cyan" id="qs-level">1</div>
+            <div class="qs-label">LEVEL</div>
+          </div>
+          <div class="qs-box">
+            <div class="qs-val text-green" id="qs-accuracy">--%</div>
+            <div class="qs-label">ACCURACY</div>
+          </div>
+          <div class="qs-box">
+            <div class="qs-val text-yellow" id="qs-missions">0</div>
+            <div class="qs-label">MISSIONS DONE</div>
+          </div>
+          <div class="qs-box">
+            <div class="qs-val text-purple" id="qs-streak">0</div>
+            <div class="qs-label">WIN STREAK</div>
+          </div>
+        </div>
+
+        <div class="section-header">
+          <div class="section-title">THREAT ZONES</div>
+          <div class="section-line"></div>
+        </div>
+
+        <div class="city-map">
+          <div class="map-zone" onclick="goToZone('phishing')">
+            <div class="zone-badge badge-easy">EASY</div>
+            <div class="zone-icon">📧</div>
+            <div class="zone-name">PHISHING DISTRICT</div>
+            <div class="zone-desc">Analisis email phishing dan scam. Deteksi domain palsu, link berbahaya.</div>
+          </div>
+          <div class="map-zone" onclick="goToZone('social')">
+            <div class="zone-badge badge-easy">EASY</div>
+            <div class="zone-icon">🎭</div>
+            <div class="zone-name">SOCIAL ENGINEERING HUB</div>
+            <div class="zone-desc">Identifikasi manipulasi psikologis, pretexting, dan impersonasi.</div>
+          </div>
+          <div class="map-zone" onclick="goToZone('web')">
+            <div class="zone-badge badge-med">MEDIUM</div>
+            <div class="zone-icon">🌐</div>
+            <div class="zone-name">WEB THREAT SECTOR</div>
+            <div class="zone-desc">Periksa website mencurigakan, SSL, domain spoofing, clickjacking.</div>
+          </div>
+          <div class="map-zone" onclick="goToZone('malware')">
+            <div class="zone-badge badge-med">MEDIUM</div>
+            <div class="zone-icon">🦠</div>
+            <div class="zone-name">MALWARE QUARANTINE</div>
+            <div class="zone-desc">Analisis file mencurigakan, ekstensi ganda, metadata, hash check.</div>
+          </div>
+          <div class="map-zone" onclick="goToZone('scam')">
+            <div class="zone-badge badge-hard">HARD</div>
+            <div class="zone-icon">💸</div>
+            <div class="zone-name">SCAM NETWORK ZONE</div>
+            <div class="zone-desc">Deteksi penipuan finansial, crypto scam, romance scam, skimming.</div>
+          </div>
+          <div class="map-zone locked">
+            <div class="zone-badge badge-locked">LOCKED</div>
+            <div class="zone-icon">🔒</div>
+            <div class="zone-name">DARKNET SECTOR</div>
+            <div class="zone-desc">Butuh Level 10 untuk membuka zona ini.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MISSIONS PANEL -->
+      <div class="panel" id="panel-missions">
+        <div class="section-header">
+          <div class="section-title">MISSION BOARD</div>
+          <div class="section-line"></div>
+        </div>
+        <div class="mission-filter">
+          <button class="filter-btn active" onclick="filterMissions('all',this)">ALL</button>
+          <button class="filter-btn" onclick="filterMissions('phishing',this)">PHISHING</button>
+          <button class="filter-btn" onclick="filterMissions('social',this)">SOCIAL ENG</button>
+          <button class="filter-btn" onclick="filterMissions('web',this)">WEB</button>
+          <button class="filter-btn" onclick="filterMissions('malware',this)">MALWARE</button>
+          <button class="filter-btn" onclick="filterMissions('scam',this)">SCAM</button>
+        </div>
+        <div class="mission-list" id="mission-list"></div>
+      </div>
+
+      <!-- SKILL TREE PANEL -->
+      <div class="panel" id="panel-skills">
+        <div class="section-header"><div class="section-title">SKILL TREE</div><div class="section-line"></div></div>
+        <div class="skill-points-display">
+          <span style="font-size:14px;">⚡</span>
+          <span style="font-size:12px;color:var(--text2);">Skill Points tersedia:</span>
+          <span style="font-family:var(--hud);font-size:16px;color:var(--yellow);" id="sp-display">0</span>
+          <span style="font-size:11px;color:var(--text2);margin-left:8px;">(dapatkan dari naik level)</span>
+        </div>
+        <div class="skill-tree-grid" id="skill-tree-grid"></div>
+      </div>
+
+      <!-- INVENTORY PANEL -->
+      <div class="panel" id="panel-inventory">
+        <div class="section-header"><div class="section-title">INVENTORY</div><div class="section-line"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:12px;">Item aktif memengaruhi gameplay. Klik untuk detail atau gunakan.</div>
+        <div class="inventory-grid" id="inventory-grid"></div>
+      </div>
+
+      <!-- SHOP PANEL -->
+      <div class="panel" id="panel-shop">
+        <div class="section-header"><div class="section-title">ITEM SHOP</div><div class="section-line"></div></div>
+        <div style="margin-bottom:14px;font-size:12px;color:var(--text2);">Kredit kamu: <span class="text-yellow" id="shop-credits">500</span> CR</div>
+        <div class="shop-grid" id="shop-grid"></div>
+      </div>
+
+      <!-- STATS PANEL -->
+      <div class="panel" id="panel-stats">
+        <div class="section-header"><div class="section-title">RESEARCH DASHBOARD</div><div class="section-line"></div></div>
+        <div style="background:rgba(0,255,240,0.05);border:1px solid var(--border2);padding:10px 14px;margin-bottom:16px;font-size:11px;color:var(--cyan);">
+          📊 Data ini direkam untuk keperluan penelitian kuantitatif efektivitas game edukasi keamanan siber.
+        </div>
+        <div class="stats-grid">
+          <div class="stat-widget">
+            <div class="sw-title">PERFORMANCE METRICS</div>
+            <div class="metric-row"><span>Total Sesi</span><span class="metric-val" id="stat-sessions">0</span></div>
+            <div class="metric-row"><span>Akurasi Global</span><span class="metric-val text-green" id="stat-accuracy">--%</span></div>
+            <div class="metric-row"><span>Avg Response Time</span><span class="metric-val text-cyan" id="stat-rt">--s</span></div>
+            <div class="metric-row"><span>Benar</span><span class="metric-val text-green" id="stat-correct">0</span></div>
+            <div class="metric-row"><span>Salah</span><span class="metric-val text-red" id="stat-wrong">0</span></div>
+            <div class="metric-row"><span>False Positive</span><span class="metric-val text-yellow" id="stat-fp">0</span></div>
+            <div class="metric-row"><span>False Negative</span><span class="metric-val text-orange" id="stat-fn">0</span></div>
+          </div>
+          <div class="stat-widget">
+            <div class="sw-title">AWARENESS INDEX</div>
+            <div class="awareness-ring">
+              <div style="font-size:11px;color:var(--text2);text-align:center;">
+                <div class="awareness-num" id="awareness-num">0%</div>
+                <div style="font-size:10px;color:var(--text2);">AWARENESS</div>
+              </div>
+            </div>
+            <div class="metric-row"><span>Phishing Detection</span><span class="metric-val" id="ai-phish">--%</span></div>
+            <div class="metric-row"><span>Social Eng. Detection</span><span class="metric-val" id="ai-social">--%</span></div>
+            <div class="metric-row"><span>Malware Detection</span><span class="metric-val" id="ai-mal">--%</span></div>
+            <div class="metric-row"><span>Scam Detection</span><span class="metric-val" id="ai-scam">--%</span></div>
+          </div>
+          <div class="stat-widget">
+            <div class="sw-title">RESPONSE TIME TREND</div>
+            <div class="mini-chart" id="rt-chart"></div>
+            <div style="font-size:10px;color:var(--text2);margin-top:6px;">Waktu respons per 8 sesi terakhir (detik)</div>
+          </div>
+          <div class="stat-widget">
+            <div class="sw-title">THREAT TYPE ANALYSIS</div>
+            <div class="metric-row"><span>Phishing</span><span class="metric-val" id="ttype-phish">0 case</span></div>
+            <div class="metric-row"><span>Social Engineering</span><span class="metric-val" id="ttype-social">0 case</span></div>
+            <div class="metric-row"><span>Web Threat</span><span class="metric-val" id="ttype-web">0 case</span></div>
+            <div class="metric-row"><span>Malware</span><span class="metric-val" id="ttype-mal">0 case</span></div>
+            <div class="metric-row"><span>Scam</span><span class="metric-val" id="ttype-scam">0 case</span></div>
+          </div>
+        </div>
+        <div class="section-header mt16"><div class="section-title">EXPORT RESEARCH DATA</div><div class="section-line"></div></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-cyan" onclick="exportJSON()">📤 Export JSON</button>
+          <button class="btn btn-green" onclick="exportCSV()">📊 Export CSV</button>
+        </div>
+      </div>
+
+      <!-- ACHIEVEMENTS PANEL -->
+      <div class="panel" id="panel-achievements">
+        <div class="section-header"><div class="section-title">ACHIEVEMENTS</div><div class="section-line"></div></div>
+        <div class="achievement-grid" id="achievement-grid"></div>
+      </div>
+
+      <!-- NPC PANEL -->
+      <div class="panel" id="panel-npcs">
+        <!-- Rendered by renderNpcPanel() -->
+      </div>
+
+      <!-- LEADERBOARD PANEL -->
+      <div class="panel" id="panel-leaderboard">
+        <div class="section-header"><div class="section-title">GLOBAL LEADERBOARD</div><div class="section-line"></div></div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:14px;">Skor dihitung dari: akurasi × misi selesai × bonus kecepatan</div>
+        <div id="leaderboard-list"></div>
+      </div>
+
+    </div><!-- main-content -->
+  </div>
+</div>
+
+<div class="screen" id="battle">
+  <div class="battle-topbar">
+    <button class="btn btn-sm" onclick="exitBattle()">← KEMBALI</button>
+    <div class="battle-title">DUEL ARENA</div>
+    <div class="battle-turn" id="battle-turn-label">TURN 1</div>
+  </div>
+  <div class="battle-area">
+    <div class="battle-side battle-player-side">
+      <div class="battle-card battle-player-card">
+        <div class="battle-portrait" id="battle-player-avatar">🕵️</div>
+        <div class="battle-name" id="battle-player-name">AGENT</div>
+        <div class="battle-bar-row">
+          <div class="battle-bar-label">HP</div>
+          <div class="bar-track battle-bar-track"><div class="bar-fill hp-fill-bar" id="battle-player-hp-bar" style="width:100%"></div></div>
+          <div class="battle-bar-value" id="battle-player-hp-val">100/100</div>
+        </div>
+        <div class="battle-bar-row">
+          <div class="battle-bar-label">Stamina</div>
+          <div class="bar-track battle-bar-track"><div class="bar-fill sta-fill-bar" id="battle-player-sta-bar" style="width:100%"></div></div>
+          <div class="battle-bar-value" id="battle-player-sta-val">100/100</div>
+        </div>
+      </div>
+    </div>
+    <div class="battle-stage-panel">
+      <div class="battle-stage-frame">
+        <div class="battle-stage" id="battle-map"></div>
+      </div>
+      <div class="battle-controls-row">
+        <button class="btn btn-sm" onclick="battleMove('up')">↑</button>
+        <button class="btn btn-sm" onclick="battleMove('left')">←</button>
+        <button class="btn btn-sm" onclick="battleMove('down')">↓</button>
+        <button class="btn btn-sm" onclick="battleMove('right')">→</button>
+      </div>
+    </div>
+    <div class="battle-side battle-enemy-side">
+      <div class="battle-card battle-enemy-card">
+        <div class="battle-portrait battle-enemy-avatar" id="battle-enemy-avatar">🤖</div>
+        <div class="battle-name" id="battle-enemy-name">ROGUE AI</div>
+        <div class="battle-bar-row">
+          <div class="battle-bar-label">HP</div>
+          <div class="bar-track battle-bar-track"><div class="bar-fill" id="battle-enemy-hp-bar" style="width:100%;background:var(--red);"></div></div>
+          <div class="battle-bar-value" id="battle-enemy-hp-val">80/80</div>
+        </div>
+        <div class="battle-bar-row">
+          <div class="battle-bar-label">DEF</div>
+          <div class="battle-bar-value" id="battle-enemy-desc">4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="battle-footer">
+    <div class="battle-skills-panel">
+      <div class="battle-panel-title">SKILLS</div>
+      <div id="battle-skill-list" class="battle-skill-list"></div>
+    </div>
+    <div class="battle-log-panel">
+      <div class="battle-panel-title">BATTLE LOG</div>
+      <div id="battle-log" class="battle-log"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     GAMEPLAY SCREEN
+══════════════════════════════════════ -->
+<div class="screen" id="gameplay">
+  <div class="gp-topbar">
+    <button class="btn btn-sm" style="border-color:var(--border2);color:var(--text2);" onclick="exitGameplay()">← EXIT</button>
+    <div class="gp-title" id="gp-mission-title">MISSION</div>
+    <div style="font-size:11px;color:var(--text2);">Case <span id="gp-case-num" class="text-cyan">1</span>/<span id="gp-case-total">5</span></div>
+    <div style="font-size:11px;color:var(--text2);">Score: <span id="gp-score" class="text-yellow">0</span></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+      <span style="font-size:11px;color:var(--text2);">STAMINA:</span>
+      <div class="bar-track" style="width:80px;"><div class="bar-fill sta-fill-bar" id="gp-sta-bar" style="width:100%"></div></div>
+    </div>
+    <div class="gp-timer" id="gp-timer">00:30</div>
+  </div>
+
+  <div class="gp-main">
+    <!-- Investigation Area -->
+    <div class="investigation-area" id="investigation-area">
+      <div class="threat-header">
+        <div>
+          <div class="threat-type-badge" id="threat-badge">UNKNOWN</div>
+          <div style="font-family:var(--hud);font-size:16px;color:var(--white);margin-top:8px;" id="threat-name">Loading...</div>
+          <div style="font-size:12px;color:var(--text2);margin-top:4px;" id="threat-sub">Analisis bukti dan tentukan verdikmu.</div>
+        </div>
+      </div>
+
+      <!-- ARTIFACT (email/file/site) -->
+      <div id="artifact-container"></div>
+
+      <!-- INDICATORS -->
+      <div class="indicators" id="indicators-panel">
+        <div class="ind-title">// THREAT INDICATORS</div>
+        <div id="indicators-list"></div>
+      </div>
+
+      <!-- CLUE CHECKLIST -->
+      <div class="clue-area" id="clue-area" style="display:none;">
+        <div style="font-family:var(--hud);font-size:11px;color:var(--cyan);letter-spacing:2px;margin-bottom:8px;">// EVIDENCE CLUES</div>
+        <div id="clues-list"></div>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="gp-sidebar">
+      <div class="gp-sidebar-tabs">
+        <div class="gp-stab active" onclick="switchGpTab('tab-ava',this)">AVA</div>
+        <div class="gp-stab" onclick="switchGpTab('tab-risk',this)">RISK</div>
+        <div class="gp-stab" onclick="switchGpTab('tab-tools',this)">TOOLS</div>
+      </div>
+
+      <!-- AVA TAB -->
+      <div class="gp-sidebar-body" id="tab-ava">
+        <div class="ava-chat">
+          <div class="ava-messages" id="ava-messages"></div>
+          <div class="ava-input-row">
+            <input class="ava-input" id="ava-input" placeholder="Tanya AVA..." onkeydown="if(event.key==='Enter')sendToAva()">
+            <button class="btn btn-sm btn-cyan" onclick="sendToAva()">SEND</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RISK TAB -->
+      <div class="gp-sidebar-body" id="tab-risk" style="display:none;">
+        <div class="risk-meter">
+          <div class="risk-label">THREAT RISK LEVEL</div>
+          <div class="risk-track">
+            <div class="risk-fill" id="risk-fill" style="width:0%;background:var(--green);">
+              <span class="risk-val" id="risk-val">0%</span>
+            </div>
+          </div>
+          <div class="risk-ticks">
+            <span class="risk-tick">LOW</span>
+            <span class="risk-tick">MED</span>
+            <span class="risk-tick">HIGH</span>
+            <span class="risk-tick">CRIT</span>
+          </div>
+        </div>
+        <div style="font-family:var(--hud);font-size:10px;color:var(--text2);letter-spacing:2px;margin:12px 0 6px;">PHISHING INDICATORS</div>
+        <div id="phish-indicators"></div>
+        <div style="font-family:var(--hud);font-size:10px;color:var(--text2);letter-spacing:2px;margin:12px 0 6px;">ADAPTIVE LEARNING</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.7;" id="adaptive-hint">
+          Sistem sedang menganalisis pola ancaman...
+        </div>
+      </div>
+
+      <!-- TOOLS TAB -->
+      <div class="gp-sidebar-body" id="tab-tools" style="display:none;">
+        <div style="font-family:var(--hud);font-size:10px;color:var(--cyan);letter-spacing:2px;margin-bottom:10px;">INVESTIGATOR TOOLS</div>
+        <div id="tools-list"></div>
+      </div>
+
+      <div class="verdict-area">
+        <div class="verdict-title">// FINAL VERDICT</div>
+        <div class="verdict-row">
+          <div class="verdict-btn v-safe" onclick="submitVerdict('safe')">✅ AMAN</div>
+          <div class="verdict-btn v-threat" onclick="submitVerdict('threat')">⚠️ ANCAMAN</div>
+        </div>
+        <div class="v-report" onclick="submitVerdict('report')">🚨 LAPORKAN KE AUTHORITIES</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     MODALS
+══════════════════════════════════════ -->
+<!-- Result Modal -->
+<div class="modal-overlay" id="result-modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-result-icon" id="modal-icon">🎯</div>
+      <div>
+        <div class="modal-result-title" id="modal-title">ANALISIS SELESAI</div>
+        <div style="font-size:12px;color:var(--text2);" id="modal-sub">—</div>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="result-score-row">
+        <div class="rscore-box"><div class="rscore-val text-yellow" id="modal-pts">+0</div><div class="rscore-label">POINTS</div></div>
+        <div class="rscore-box"><div class="rscore-val text-cyan" id="modal-xp">+0 XP</div><div class="rscore-label">EXPERIENCE</div></div>
+        <div class="rscore-box"><div class="rscore-val text-green" id="modal-time">0s</div><div class="rscore-label">RESPONSE TIME</div></div>
+      </div>
+      <div class="edu-panel" id="modal-edu">
+        <div class="edu-title">// EDUCATIONAL INSIGHT</div>
+        <div id="modal-edu-content"></div>
+      </div>
+      <div id="modal-clue-reveal" style="margin-bottom:12px;"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;">
+        <button class="btn btn-cyan" id="modal-next-btn" onclick="nextCase()">NEXT CASE →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AVA Modal -->
+<div class="modal-overlay" id="ava-modal">
+  <div class="modal-box" style="width:480px;">
+    <div class="modal-header" style="background:rgba(170,68,255,0.1);">
+      <div class="ava-avatar" style="width:36px;height:36px;font-size:18px;">🤖</div>
+      <div>
+        <div style="font-family:var(--hud);font-size:12px;color:var(--purple);letter-spacing:2px;">AVA — AI ASSISTANT</div>
+        <div style="font-size:11px;color:var(--text2);">Adaptive Virtual Assistant v3.2</div>
+      </div>
+      <button class="btn btn-sm" onclick="closeAva()" style="margin-left:auto;border-color:var(--border2);color:var(--text2);">✕</button>
+    </div>
+    <div class="modal-body" style="padding:0;">
+      <div style="padding:16px;height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:10px;" id="ava-hub-messages"></div>
+      <div style="padding:12px;border-top:1px solid var(--border);display:flex;gap:8px;">
+        <input class="field-input" style="flex:1;padding:8px;" id="ava-hub-input" placeholder="Tanya AVA tentang ancaman siber..." onkeydown="if(event.key==='Enter')sendAvaHub()">
+        <button class="btn btn-cyan btn-sm" onclick="sendAvaHub()">SEND</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NPC Modal -->
+<div class="modal-overlay" id="npc-modal">
+  <div class="modal-box" style="width:500px;">
+    <div class="modal-header" style="gap:16px;">
+      <div id="npc-avatar-display" style="font-size:40px;width:56px;height:56px;display:flex;align-items:center;justify-content:center;border:1px solid var(--border2);background:var(--bg2);">🕵️</div>
+      <div style="flex:1;">
+        <div id="npc-name-display" style="font-family:var(--hud);font-size:15px;font-weight:700;letter-spacing:2px;">NPC</div>
+        <div id="npc-role-display" style="font-size:11px;color:var(--text2);margin-top:3px;">Role</div>
+      </div>
+      <button class="btn btn-sm" onclick="closeNpc()" style="border-color:var(--border2);color:var(--text2);">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--bg2);border:1px solid var(--border2);padding:16px;margin-bottom:14px;border-radius:0 8px 8px 8px;min-height:80px;">
+        <div style="font-size:9px;color:var(--text3);letter-spacing:2px;font-family:var(--hud);margin-bottom:6px;">// NPC DIALOG</div>
+        <div id="npc-dialog-text" style="font-size:13px;color:var(--text);line-height:1.7;"></div>
+      </div>
+      <div style="background:rgba(255,229,102,0.05);border:1px solid rgba(255,229,102,0.2);padding:10px 14px;margin-bottom:16px;font-size:12px;color:var(--yellow);" id="npc-quest-hint"></div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-cyan" style="flex:1;" onclick="nextNpcDialog()">▶ LANJUT DIALOG</button>
+        <button class="btn btn-green btn-sm" onclick="closeNpc()">TUTUP</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notification container -->
+<div id="notif-container" style="position:fixed;top:16px;right:16px;z-index:2000;display:flex;flex-direction:column;gap:8px;"></div>
+
+<!-- SFX -->
+<div class="sfx-big" id="sfx-big">
+  <div class="sfx-text-big" id="sfx-text-big"></div>
+</div>
+
+<!-- ══════════════════════════════════════
+     JAVASCRIPT ENGINE
+══════════════════════════════════════ -->
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

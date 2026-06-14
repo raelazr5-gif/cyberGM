@@ -1,0 +1,20 @@
+
+body{
+    margin:0;
+    background:#07111f;
+    color:#00e5ff;
+    font-family:Arial,sans-serif;
+    padding:30px;
+}
+.panel{
+    border:1px solid #00e5ff;
+    padding:20px;
+    background:#081520;
+}
+button{
+    padding:10px 16px;
+    background:#00e5ff;
+    border:none;
+    cursor:pointer;
+    font-weight:bold;
+}

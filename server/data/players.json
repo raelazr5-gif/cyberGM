@@ -1,0 +1,239 @@
+{
+  "1": {
+    "name": "1",
+    "avatar": "🕵️",
+    "spec": "analyst",
+    "level": 1,
+    "exp": 0,
+    "expNeeded": 100,
+    "hp": 100,
+    "maxHp": 100,
+    "stamina": 100,
+    "maxStamina": 100,
+    "credits": 500,
+    "skillPoints": 2,
+    "learnedSkills": [],
+    "inventory": [
+      "s6",
+      "s7",
+      "s8"
+    ],
+    "completedMissions": [],
+    "unlockedAchievements": [],
+    "streak": 0,
+    "researchData": {
+      "totalSessions": 0,
+      "missionsCompleted": 0,
+      "totalCorrect": 0,
+      "totalWrong": 0,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "responseTimes": [],
+      "fastestResponse": 999,
+      "decisionLog": [],
+      "threatTypeStats": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "threatTypeCorrect": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "shopPurchases": 0
+    }
+  },
+  "dada": {
+    "name": "dada",
+    "avatar": "🕵️",
+    "spec": "analyst",
+    "level": 1,
+    "exp": 5,
+    "expNeeded": 100,
+    "hp": 85,
+    "maxHp": 100,
+    "stamina": 90,
+    "maxStamina": 100,
+    "credits": 500,
+    "skillPoints": 2,
+    "learnedSkills": [],
+    "inventory": [
+      "s6",
+      "s7",
+      "s8"
+    ],
+    "completedMissions": [],
+    "unlockedAchievements": [],
+    "streak": 0,
+    "researchData": {
+      "totalSessions": 1,
+      "missionsCompleted": 0,
+      "totalCorrect": 0,
+      "totalWrong": 1,
+      "falsePositive": 0,
+      "falseNegative": 1,
+      "responseTimes": [
+        5.662
+      ],
+      "fastestResponse": 5.662,
+      "decisionLog": [
+        {
+          "caseId": "c1",
+          "type": "phishing",
+          "verdict": "safe",
+          "correctVerdict": "threat",
+          "isCorrect": false,
+          "responseTime": "5.66",
+          "timestamp": "2026-06-03T12:26:58.044Z"
+        }
+      ],
+      "threatTypeStats": {
+        "phishing": 1,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "threatTypeCorrect": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "shopPurchases": 0
+    }
+  },
+  "H6Q632": {
+    "name": "H6Q632",
+    "avatar": "🕵️",
+    "spec": "analyst",
+    "level": 1,
+    "exp": 38,
+    "expNeeded": 100,
+    "hp": 85,
+    "maxHp": 100,
+    "stamina": 90,
+    "maxStamina": 100,
+    "credits": 500,
+    "skillPoints": 1,
+    "learnedSkills": [
+      "a1"
+    ],
+    "inventory": [
+      "s6",
+      "s7",
+      "s8"
+    ],
+    "completedMissions": [],
+    "unlockedAchievements": [
+      "ach4"
+    ],
+    "streak": 1,
+    "researchData": {
+      "totalSessions": 2,
+      "missionsCompleted": 0,
+      "totalCorrect": 1,
+      "totalWrong": 1,
+      "falsePositive": 0,
+      "falseNegative": 1,
+      "responseTimes": [
+        5.01,
+        4.778
+      ],
+      "fastestResponse": 4.778,
+      "decisionLog": [
+        {
+          "caseId": "c1",
+          "type": "phishing",
+          "verdict": "safe",
+          "correctVerdict": "threat",
+          "isCorrect": false,
+          "responseTime": "5.01",
+          "timestamp": "2026-06-03T12:28:36.139Z"
+        },
+        {
+          "caseId": "c2",
+          "type": "phishing",
+          "verdict": "safe",
+          "correctVerdict": "safe",
+          "isCorrect": true,
+          "responseTime": "4.78",
+          "timestamp": "2026-06-03T12:28:44.641Z"
+        }
+      ],
+      "threatTypeStats": {
+        "phishing": 2,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "threatTypeCorrect": {
+        "phishing": 1,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "shopPurchases": 0
+    }
+  },
+  "seren": {
+    "name": "seren",
+    "username": "seren",
+    "fullname": "sax",
+    "email": "serem@gmail.com",
+    "avatar": "🕵️",
+    "spec": "analyst",
+    "level": 1,
+    "exp": 0,
+    "expNeeded": 100,
+    "hp": 100,
+    "maxHp": 100,
+    "stamina": 100,
+    "maxStamina": 100,
+    "credits": 500,
+    "skillPoints": 2,
+    "learnedSkills": [],
+    "inventory": [
+      "s6",
+      "s7",
+      "s8"
+    ],
+    "completedMissions": [],
+    "unlockedAchievements": [],
+    "streak": 0,
+    "researchData": {
+      "totalSessions": 0,
+      "missionsCompleted": 0,
+      "totalCorrect": 0,
+      "totalWrong": 0,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "responseTimes": [],
+      "fastestResponse": 999,
+      "decisionLog": [],
+      "threatTypeStats": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "threatTypeCorrect": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "shopPurchases": 0
+    }
+  }
+}
