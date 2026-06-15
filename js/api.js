@@ -1,20 +1,11 @@
-/** HTTP client — server dev: http://localhost:5173 */
-
-const DEFAULT_SERVER = 'http://localhost:5173';
+/** HTTP client — uses relative URLs so it works on Replit and local dev */
 
 export function getApiBase() {
-  if (typeof window === 'undefined') return DEFAULT_SERVER;
-  const { protocol, hostname, port } = window.location;
-  if (protocol === 'file:') return DEFAULT_SERVER;
-  if (hostname === 'localhost' || hostname === '127.0.0.1') {
-    if (port === '5173' || port === '') return '';
-  }
-  return DEFAULT_SERVER;
+  return '';
 }
 
 function apiUrl(path) {
-  const base = getApiBase();
-  return `${base}${path.startsWith('/') ? path : `/${path}`}`;
+  return path.startsWith('/') ? path : `/${path}`;
 }
 
 export async function checkServerHealth() {
