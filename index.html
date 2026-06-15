@@ -185,48 +185,12 @@
         </div>
 
         <div class="section-header">
-          <div class="section-title">THREAT ZONES</div>
+          <div class="section-title">THREAT ZONES — WORLD MAP</div>
           <div class="section-line"></div>
         </div>
 
-        <div class="city-map">
-          <div class="map-zone" onclick="goToZone('phishing')">
-            <div class="zone-badge badge-easy">EASY</div>
-            <div class="zone-icon">📧</div>
-            <div class="zone-name">PHISHING DISTRICT</div>
-            <div class="zone-desc">Analisis email phishing dan scam. Deteksi domain palsu, link berbahaya.</div>
-          </div>
-          <div class="map-zone" onclick="goToZone('social')">
-            <div class="zone-badge badge-easy">EASY</div>
-            <div class="zone-icon">🎭</div>
-            <div class="zone-name">SOCIAL ENGINEERING HUB</div>
-            <div class="zone-desc">Identifikasi manipulasi psikologis, pretexting, dan impersonasi.</div>
-          </div>
-          <div class="map-zone" onclick="goToZone('web')">
-            <div class="zone-badge badge-med">MEDIUM</div>
-            <div class="zone-icon">🌐</div>
-            <div class="zone-name">WEB THREAT SECTOR</div>
-            <div class="zone-desc">Periksa website mencurigakan, SSL, domain spoofing, clickjacking.</div>
-          </div>
-          <div class="map-zone" onclick="goToZone('malware')">
-            <div class="zone-badge badge-med">MEDIUM</div>
-            <div class="zone-icon">🦠</div>
-            <div class="zone-name">MALWARE QUARANTINE</div>
-            <div class="zone-desc">Analisis file mencurigakan, ekstensi ganda, metadata, hash check.</div>
-          </div>
-          <div class="map-zone" onclick="goToZone('scam')">
-            <div class="zone-badge badge-hard">HARD</div>
-            <div class="zone-icon">💸</div>
-            <div class="zone-name">SCAM NETWORK ZONE</div>
-            <div class="zone-desc">Deteksi penipuan finansial, crypto scam, romance scam, skimming.</div>
-          </div>
-          <div class="map-zone locked">
-            <div class="zone-badge badge-locked">LOCKED</div>
-            <div class="zone-icon">🔒</div>
-            <div class="zone-name">DARKNET SECTOR</div>
-            <div class="zone-desc">Butuh Level 10 untuk membuka zona ini.</div>
-          </div>
-        </div>
+        <div class="world-map-hint">🗺️ Klik zona di peta untuk memulai misi · Drag untuk menjelajah</div>
+        <div class="world-map-wrap" id="world-map-container"></div>
       </div>
 
       <!-- MISSIONS PANEL -->
