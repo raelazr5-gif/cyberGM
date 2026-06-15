@@ -154,57 +154,52 @@ const DETECTIVE_PALETTE = {
   8: '#00ccff',  // laptop screen (bright cyan)
 };
 
-// ── Enemy sprite: Round 1 — Phishing Hacker ──────────────────
+// ── Enemy sprite: Round 1 — Trojan Virus ──────────────────────
 const HACKER_GRID = [
-  [0,1,1,1,1,1,1,0],  // hood peak
-  [1,1,1,1,1,1,1,1],  // hood top
-  [1,1,2,2,2,2,1,1],  // face
-  [1,2,3,2,2,3,2,1],  // glowing red eyes
-  [1,1,2,2,2,2,1,1],  // lower face
-  [0,1,1,2,2,1,1,0],  // chin
-  [0,4,4,4,4,4,4,0],  // collar
-  [4,4,4,5,5,4,4,4],  // coat + green stripes
-  [4,4,5,4,4,5,4,4],  // code pattern
-  [4,4,4,4,4,4,4,4],  // lower coat
+  [0,1,0,1,1,0,1,0],  // glitch top spikes
+  [1,1,1,1,1,1,1,1],  // corrupted head
+  [1,2,3,2,2,3,2,1],  // red virus eyes
+  [1,2,2,2,2,2,2,1],  // face (corrupted)
+  [0,1,4,4,4,4,1,0],  // neck glitch
+  [4,1,4,5,5,4,1,4],  // body with corruption artifacts
+  [4,4,5,4,4,5,4,4],  // body glitch bands
+  [1,4,4,4,4,4,4,1],  // lower body
   [0,4,4,4,4,4,4,0],  // waist
-  [0,4,6,0,0,6,4,0],  // legs
-  [0,0,6,0,0,6,0,0],  // lower legs
-  [0,0,6,6,6,6,0,0],  // boots
+  [0,1,4,6,6,4,1,0],  // legs (data tentacles)
+  [0,0,6,1,1,6,0,0],  // lower legs
+  [0,0,1,6,6,1,0,0],  // corrupted boots
 ];
 const HACKER_PALETTE = {
-  1: '#1a083a',  // dark hood
-  2: '#7a6555',  // skin
-  3: '#ff1133',  // red glowing eyes
-  4: '#2a0a18',  // dark coat
-  5: '#22aa44',  // green code stripes
-  6: '#180a10',  // dark boots
+  1: '#ff1133',  // red corruption glitch
+  2: '#1a0505',  // dark corrupted form
+  3: '#ff0000',  // bright red virus eyes
+  4: '#200810',  // dark body
+  5: '#aa0022',  // deep red artifact
+  6: '#0e0006',  // dark tendrils
 };
 
-// ── Enemy sprite: Round 2 — Malware Bot ──────────────────────
+// ── Enemy sprite: Round 2 — Worm Malware ─────────────────────
 const MALWARE_BOT_GRID = [
-  [0,0,1,1,1,1,0,0],  // head top
-  [0,1,1,1,1,1,1,0],  // head
-  [1,2,3,2,2,3,2,1],  // visor eyes (green)
-  [1,1,4,4,4,4,1,1],  // head body / jaw
-  [0,1,1,1,1,1,1,0],  // neck
-  [1,1,4,4,4,4,1,1],  // shoulder pads
-  [4,4,4,4,4,4,4,4],  // torso
-  [4,5,4,3,3,4,5,4],  // torso with lights
-  [4,4,4,4,4,4,4,4],  // lower torso
-  [0,4,4,4,4,4,4,0],  // waist
-  [0,4,6,6,6,6,4,0],  // legs
-  [0,4,6,0,0,6,4,0],  // knee joints
-  [0,0,6,0,0,6,0,0],  // lower legs
-  [0,0,7,7,7,7,0,0],  // feet
+  [0,0,0,1,1,0,0,0],  // head segment
+  [0,0,1,2,2,1,0,0],  // head body
+  [0,1,2,3,3,2,1,0],  // glowing green eyes
+  [1,1,2,2,2,2,1,1],  // body segment 1
+  [1,4,4,4,4,4,4,1],  // body segment 2 (wider)
+  [0,1,5,4,4,5,1,0],  // segment connector glow
+  [0,4,4,4,4,4,4,0],  // body segment 3
+  [0,1,5,4,4,5,1,0],  // segment connector
+  [0,4,4,4,4,4,4,0],  // body segment 4
+  [0,0,1,5,5,1,0,0],  // tail narrowing
+  [0,0,0,6,6,0,0,0],  // tail tip
+  [0,0,0,0,6,0,0,0],  // tail end
 ];
 const MALWARE_BOT_PALETTE = {
-  1: '#1a2a3a',  // metal head dark
-  2: '#2a4a2a',  // dark visor
-  3: '#22ff44',  // green screen eyes
-  4: '#223344',  // metal body
-  5: '#ff6600',  // warning lights
-  6: '#1a2a3a',  // leg metal
-  7: '#0a1a2a',  // feet
+  1: '#0a2a0a',  // dark green segment outline
+  2: '#1a3a10',  // head skin (dark green)
+  3: '#22ff44',  // bright green eyes
+  4: '#102010',  // body segments
+  5: '#22aa33',  // segment connectors (bright green)
+  6: '#061506',  // tail tip
 };
 
 // ── Enemy sprite: Round 3 — Ransomware King ──────────────────
@@ -239,10 +234,38 @@ const RANSOMWARE_PALETTE = {
 };
 
 const ENEMY_TYPES = [
-  { grid: HACKER_GRID,      palette: HACKER_PALETTE,      name: 'PHISHING HACKER', baseHp: 80  },
-  { grid: MALWARE_BOT_GRID, palette: MALWARE_BOT_PALETTE, name: 'MALWARE BOT',     baseHp: 104 },
+  { grid: HACKER_GRID,      palette: HACKER_PALETTE,      name: 'TROJAN VIRUS',    baseHp: 80  },
+  { grid: MALWARE_BOT_GRID, palette: MALWARE_BOT_PALETTE, name: 'WORM MALWARE',    baseHp: 104 },
   { grid: RANSOMWARE_GRID,  palette: RANSOMWARE_PALETTE,  name: 'RANSOMWARE KING', baseHp: 136 },
 ];
+
+// ── NPC Quest Giver — Mentor pixel sprite ─────────────────────
+const MENTOR_GRID = [
+  [0,0,1,1,1,1,0,0],  // hair (gray-silver)
+  [0,1,2,2,2,2,1,0],  // head
+  [0,1,2,3,3,2,1,0],  // face with glasses top
+  [0,0,2,3,2,3,2,0],  // glasses lenses
+  [0,0,2,2,2,2,0,0],  // lower face
+  [0,4,4,4,4,4,4,0],  // labcoat shoulders
+  [4,4,5,5,5,5,4,4],  // labcoat body (light)
+  [4,4,5,6,6,5,4,4],  // clipboard/tablet
+  [4,4,5,6,7,5,4,4],  // tablet screen glow
+  [0,4,4,4,4,4,4,0],  // waist
+  [0,0,8,8,0,8,8,0],  // legs
+  [0,0,8,8,0,8,8,0],  // lower legs
+  [0,0,9,9,0,9,9,0],  // shoes
+];
+const MENTOR_PALETTE = {
+  1: '#8888aa',  // silver-gray hair
+  2: '#f0c898',  // skin tone
+  3: '#22266a',  // glasses frames (dark blue)
+  4: '#d8e4f8',  // labcoat white
+  5: '#eef4ff',  // labcoat inner
+  6: '#1a1a2e',  // tablet/clipboard body
+  7: '#00ccff',  // tablet screen glow
+  8: '#2a3a8a',  // dark trousers
+  9: '#181828',  // dark shoes
+};
 
 function createCanvas(container) {
   canvas = document.createElement('canvas');
@@ -425,6 +448,11 @@ function render(s) {
   const enemyX   = (canvas.clientWidth || 600) * 0.78 * dp
                  - (ec ? (ec.attackLean || 0) * 30 * dp : 0);
   const enemyY   = floorY + bob;
+
+  // NPC Mentor: stands in far-left corner watching the battle
+  const mentorX = Math.max(18 * dp, (canvas.clientWidth || 600) * 0.05 * dp);
+  const mentorY = floorY + 2 * dp;
+  drawPixelCharacter(mentorX, mentorY, MENTOR_GRID, MENTOR_PALETTE, null, true, s.time);
 
   const et = ENEMY_TYPES[s.enemyType || 0];
 
@@ -849,149 +877,362 @@ function showInsightToast(text, correct) {
   setTimeout(() => toast.remove(), 2700);
 }
 
-// ── Cyber Forest background ───────────────────────────────────
+// ── Computer Room Background ──────────────────────────────────
 function drawCyberForest(w, h, time) {
-  const dp = devicePixelRatio;
+  drawComputerRoom(w, h, time);
+}
 
-  // Sky
-  const skyGrad = ctx.createLinearGradient(0, 0, 0, h * 0.68);
-  skyGrad.addColorStop(0,   '#010608');
-  skyGrad.addColorStop(0.5, '#030d14');
-  skyGrad.addColorStop(1,   '#041218');
-  ctx.fillStyle = skyGrad;
-  ctx.fillRect(0, 0, w, h * 0.68);
+function drawComputerRoom(w, h, time) {
+  const dp   = devicePixelRatio;
+  const floorY = h * 0.72;
 
-  // Floating network nodes + connection lines
-  const nodePos = [0.08, 0.18, 0.30, 0.50, 0.62, 0.75, 0.88, 0.95];
-  const nodeY   = [0.06, 0.12, 0.08, 0.14, 0.09, 0.13, 0.07, 0.11];
-  ctx.lineWidth = 1;
-  for (let i = 0; i < nodePos.length; i++) {
-    const nx = nodePos[i] * w;
-    const ny = nodeY[i] * h;
-    const glow = 0.25 + 0.18 * Math.sin(time / 900 + i * 1.3);
-    // line to next node
-    if (i < nodePos.length - 1) {
-      ctx.strokeStyle = `rgba(0,200,255,${glow * 0.35})`;
-      ctx.beginPath(); ctx.moveTo(nx, ny); ctx.lineTo(nodePos[i+1]*w, nodeY[i+1]*h); ctx.stroke();
-    }
-    // node square
-    ctx.fillStyle = `rgba(0,220,255,${glow})`;
-    ctx.fillRect(nx - 3*dp, ny - 3*dp, 6*dp, 6*dp);
-    // small cross
-    ctx.fillRect(nx - 6*dp, ny - dp, 12*dp, 2*dp);
-    ctx.fillRect(nx - dp, ny - 6*dp, 2*dp, 12*dp);
-  }
+  // ── Ceiling ──────────────────────────────────────────────────
+  ctx.fillStyle = '#020409';
+  ctx.fillRect(0, 0, w, h * 0.12);
 
-  // Server towers — far background silhouettes
-  const towers = [
-    { rx: 0.04,  rw: 0.040, rh: 0.28 },
-    { rx: 0.10,  rw: 0.025, rh: 0.20 },
-    { rx: 0.76,  rw: 0.042, rh: 0.30 },
-    { rx: 0.84,  rw: 0.030, rh: 0.22 },
-    { rx: 0.91,  rw: 0.035, rh: 0.18 },
-    { rx: 0.96,  rw: 0.022, rh: 0.14 },
-  ];
-  const baseY = h * 0.66;
-  towers.forEach((t, ti) => {
-    const tx = t.rx * w, tw = t.rw * w, th = t.rh * h;
-    const top = baseY - th;
-    // tower body
-    ctx.fillStyle = '#050e1a';
-    ctx.fillRect(tx, top, tw, th);
-    // window lights (static, seeded by ti)
-    for (let wy = 8*dp; wy < th - 4*dp; wy += 10*dp) {
-      for (let wx = 3*dp; wx < tw - 3*dp; wx += 7*dp) {
-        const lit = ((ti * 7 + Math.floor(wy) + Math.floor(wx)) % 5) < 3;
-        ctx.fillStyle = lit ? 'rgba(0,160,255,0.18)' : 'rgba(0,0,0,0.2)';
-        ctx.fillRect(tx + wx, top + wy, 4*dp, 6*dp);
-      }
-    }
-    // blink antenna
-    const blink = 0.3 + 0.5 * Math.abs(Math.sin(time / 700 + ti));
-    ctx.fillStyle = `rgba(255,60,60,${blink})`;
-    ctx.fillRect(tx + tw/2 - 2*dp, top - 5*dp, 4*dp, 4*dp);
+  // Ceiling light strips (rectangular LED panels — no circles)
+  const lightX = [0.15, 0.35, 0.55, 0.75];
+  lightX.forEach((lp, li) => {
+    const lx = lp * w;
+    const lw = 0.12 * w;
+    const flicker = 0.88 + 0.12 * Math.abs(Math.sin(time / 3400 + li * 2.2));
+    ctx.fillStyle = `rgba(160,210,255,${0.18 * flicker})`;
+    ctx.fillRect(lx, 2*dp, lw, 5*dp);
+    const beamG = ctx.createLinearGradient(0, 0, 0, floorY * 0.5);
+    beamG.addColorStop(0, `rgba(130,190,255,${0.07 * flicker})`);
+    beamG.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = beamG;
+    ctx.fillRect(lx, 0, lw, floorY * 0.5);
   });
 
-  // Binary trees — left and right of arena
-  const trees = [
-    { x: 0.01, h: 0.36, c: '#0a2a16' },
-    { x: 0.19, h: 0.26, c: '#0a2a16' },
-    { x: 0.73, h: 0.28, c: '#0a2a16' },
-    { x: 0.90, h: 0.34, c: '#0a2a16' },
-  ];
-  trees.forEach(t => drawBinaryTree(t.x * w, baseY, t.h * h, dp, time, t.c));
+  // ── Back Wall ─────────────────────────────────────────────────
+  const wallG = ctx.createLinearGradient(0, h * 0.10, 0, floorY);
+  wallG.addColorStop(0, '#030810');
+  wallG.addColorStop(1, '#060f1c');
+  ctx.fillStyle = wallG;
+  ctx.fillRect(0, h * 0.10, w, floorY - h * 0.10);
 
-  // Ground
-  const floorGrad = ctx.createLinearGradient(0, baseY, 0, h);
-  floorGrad.addColorStop(0, '#051015');
-  floorGrad.addColorStop(1, '#030a10');
-  ctx.fillStyle = floorGrad;
-  ctx.fillRect(0, baseY, w, h - baseY);
-
-  // Circuit traces on ground
-  ctx.strokeStyle = 'rgba(0,200,180,0.06)';
+  // Wall horizontal panel seams
   ctx.lineWidth = 1;
-  for (let gx = 0; gx < w; gx += 28*dp) {
-    ctx.beginPath(); ctx.moveTo(gx, baseY); ctx.lineTo(gx, h); ctx.stroke();
+  for (let py = h * 0.13; py < floorY; py += 30 * dp) {
+    ctx.strokeStyle = 'rgba(0,80,160,0.07)';
+    ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(w, py); ctx.stroke();
   }
-  for (let gy = baseY; gy < h; gy += 18*dp) {
-    ctx.beginPath(); ctx.moveTo(0, gy); ctx.lineTo(w, gy); ctx.stroke();
+  // Wall vertical panel seams
+  for (let px = w * 0.15; px < w * 0.86; px += 70 * dp) {
+    ctx.strokeStyle = 'rgba(0,80,160,0.05)';
+    ctx.beginPath(); ctx.moveTo(px, h * 0.10); ctx.lineTo(px, floorY); ctx.stroke();
   }
 
-  // Horizon glow line
-  ctx.strokeStyle = 'rgba(0,180,100,0.18)';
+  // ── Server Racks (left & right walls) ─────────────────────────
+  drawServerRack(0, h * 0.10, w * 0.14, floorY - h * 0.10, dp, time, 0);
+  drawServerRack(w * 0.86, h * 0.10, w * 0.14, floorY - h * 0.10, dp, time, 1);
+
+  // ── Wall-mounted Monitors (center back wall) ──────────────────
+  drawWallMonitor(w * 0.22, h * 0.14, w * 0.17, h * 0.26, dp, time, 'code');
+  drawWallMonitor(w * 0.41, h * 0.11, w * 0.18, h * 0.30, dp, time, 'alert');
+  drawWallMonitor(w * 0.61, h * 0.14, w * 0.17, h * 0.26, dp, time, 'network');
+
+  // ── Overhead Cable Conduit ────────────────────────────────────
+  ctx.fillStyle = 'rgba(0,40,90,0.6)';
+  ctx.fillRect(0, h * 0.10 - 8*dp, w, 8*dp);
+  const cableColors = [
+    'rgba(0,200,255,0.22)', 'rgba(255,140,0,0.16)',
+    'rgba(0,255,100,0.14)', 'rgba(200,100,255,0.14)',
+  ];
+  cableColors.forEach((cc, ci) => {
+    ctx.strokeStyle = cc;
+    ctx.lineWidth = 2 * dp;
+    ctx.beginPath();
+    ctx.moveTo(0,   h * 0.10 - (ci + 1) * 2 * dp);
+    ctx.lineTo(w,   h * 0.10 - (ci + 1) * 2 * dp);
+    ctx.stroke();
+  });
+
+  // ── Floor ─────────────────────────────────────────────────────
+  const floorG = ctx.createLinearGradient(0, floorY, 0, h);
+  floorG.addColorStop(0, '#040c18');
+  floorG.addColorStop(1, '#02060e');
+  ctx.fillStyle = floorG;
+  ctx.fillRect(0, floorY, w, h - floorY);
+
+  // Floor tiles (grid)
+  const tileW = 40 * dp, tileH = 20 * dp;
+  ctx.lineWidth = 1;
+  for (let fx = 0; fx < w; fx += tileW) {
+    ctx.strokeStyle = 'rgba(0,140,220,0.09)';
+    ctx.beginPath(); ctx.moveTo(fx, floorY); ctx.lineTo(fx, h); ctx.stroke();
+  }
+  for (let fy = floorY; fy < h; fy += tileH) {
+    ctx.strokeStyle = 'rgba(0,140,220,0.07)';
+    ctx.beginPath(); ctx.moveTo(0, fy); ctx.lineTo(w, fy); ctx.stroke();
+  }
+
+  // Floor edge glow strip
+  ctx.strokeStyle = 'rgba(0,190,255,0.22)';
   ctx.lineWidth = 2 * dp;
-  ctx.beginPath(); ctx.moveTo(0, baseY); ctx.lineTo(w, baseY); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(0, floorY); ctx.lineTo(w, floorY); ctx.stroke();
 
-  // Floating data packets (animated left→right)
-  for (let i = 0; i < 6; i++) {
-    const progress = ((time / 5000 + i / 6) % 1);
-    const px = progress * w;
-    const py = h * 0.10 + Math.sin(time / 1000 + i * 2.1) * h * 0.06;
-    const a  = 0.12 + 0.08 * Math.sin(time / 500 + i);
-    ctx.fillStyle = `rgba(0,255,200,${a})`;
-    ctx.fillRect(px - 4*dp, py - 2*dp, 8*dp, 4*dp);
-    // trailing dim block
-    ctx.fillStyle = `rgba(0,255,200,${a * 0.4})`;
-    ctx.fillRect(px - 10*dp, py - dp, 4*dp, 2*dp);
+  // Floor tile reflection patch (subtle)
+  const reflG = ctx.createLinearGradient(0, floorY, 0, floorY + 28*dp);
+  reflG.addColorStop(0, 'rgba(0,180,255,0.07)');
+  reflG.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.fillStyle = reflG;
+  ctx.fillRect(0, floorY, w, 28*dp);
+
+  // ── Floating Binary / Hex Data Fragments ─────────────────────
+  for (let i = 0; i < 7; i++) {
+    const prog = ((time / 9000 + i / 7) % 1);
+    const px   = w * 0.15 + prog * w * 0.70;
+    const py   = floorY * (0.28 + 0.10 * Math.sin(time / 800 + i * 1.9));
+    const a    = 0.06 + 0.04 * Math.sin(time / 450 + i);
+    ctx.fillStyle = `rgba(0,255,180,${a})`;
+    ctx.fillRect(px,          py,          14*dp, 3*dp);
+    ctx.fillRect(px + 17*dp,  py,           8*dp, 3*dp);
+    ctx.fillRect(px + 28*dp,  py,          10*dp, 3*dp);
+  }
+
+  // ── CRT Scanlines overlay ─────────────────────────────────────
+  for (let sl = 0; sl < h; sl += 4) {
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
+    ctx.fillRect(0, sl, w, 2);
   }
 }
 
-function drawBinaryTree(cx, baseY, treeH, dp, time, trunkColor) {
-  const trunkW = 5 * dp;
-  // trunk
-  ctx.fillStyle = trunkColor;
-  ctx.fillRect(cx - trunkW/2, baseY - treeH, trunkW, treeH);
+function drawServerRack(rx, ry, rw, rh, dp, time, idx) {
+  // Rack chassis
+  ctx.fillStyle = '#030810';
+  ctx.fillRect(rx, ry, rw, rh);
+  ctx.strokeStyle = 'rgba(0,80,160,0.45)';
+  ctx.lineWidth = 2 * dp;
+  ctx.strokeRect(rx, ry, rw, rh);
 
-  // branches + leaf blocks per level
-  const levels = 4;
-  for (let lv = 0; lv < levels; lv++) {
-    const lvY     = baseY - treeH * (0.28 + lv * 0.17);
-    const spread  = (10 + lv * 9) * dp;
-    const brH     = Math.max(2*dp, (4 - lv) * dp);
+  // Rack frame rails
+  ctx.fillStyle = 'rgba(0,60,120,0.4)';
+  ctx.fillRect(rx, ry, 4*dp, rh);
+  ctx.fillRect(rx + rw - 4*dp, ry, 4*dp, rh);
 
-    ctx.fillStyle = trunkColor;
-    // left branch
-    ctx.fillRect(cx - spread, lvY, spread, brH);
-    // right branch
-    ctx.fillRect(cx, lvY, spread, brH);
+  const unitH = 11 * dp;
+  const pad   = 5 * dp;
+  let ui = 0;
+  for (let uy = ry + pad; uy < ry + rh - unitH; uy += unitH + 2*dp) {
+    // 1U server tray
+    ctx.fillStyle = '#070e1e';
+    ctx.fillRect(rx + pad, uy, rw - 2*pad, unitH);
+    ctx.strokeStyle = 'rgba(0,100,200,0.18)';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(rx + pad, uy, rw - 2*pad, unitH);
 
-    // leaf pixel blocks (simulate binary "canopy")
-    for (let li = -(lv + 1); li <= (lv + 1); li++) {
-      const leafX = cx + li * 8*dp - 3*dp;
-      const leafY = lvY - 7*dp;
-      const a = 0.12 + 0.06 * Math.sin(time / 700 + lv * 1.5 + li);
-      ctx.fillStyle = `rgba(0,210,120,${a})`;
-      ctx.fillRect(leafX, leafY, 6*dp, 6*dp);
+    // Power/status LED — rectangular, no circles
+    const seed   = idx * 31 + ui * 7;
+    const active = (seed % 4) !== 1;
+    const ledA   = active
+      ? 0.6 + 0.35 * Math.abs(Math.sin(time / 500 + seed * 0.9))
+      : 0.3;
+    ctx.fillStyle = active
+      ? `rgba(0,255,100,${ledA})`
+      : `rgba(255,60,0,${ledA})`;
+    ctx.fillRect(rx + pad + 3*dp, uy + unitH/2 - dp, 4*dp, 2*dp);
+
+    // HDD activity blink — rectangular
+    const diskOn = ((time + seed * 173) % 700) < 150;
+    ctx.fillStyle = `rgba(255,200,0,${diskOn ? 0.9 : 0.08})`;
+    ctx.fillRect(rx + pad + 9*dp, uy + unitH/2 - dp, 3*dp, 2*dp);
+
+    // Vent slots (right side)
+    ctx.fillStyle = 'rgba(0,40,90,0.5)';
+    for (let vi = 0; vi < 3; vi++) {
+      ctx.fillRect(
+        rx + rw - pad - (vi + 1) * 7*dp,
+        uy + 2*dp,
+        5*dp,
+        unitH - 4*dp
+      );
     }
+    ui++;
   }
+
+  // Cable bundle at bottom of rack
+  const cbColors = [
+    'rgba(0,200,255,0.5)', 'rgba(255,120,0,0.4)',
+    'rgba(0,255,100,0.35)', 'rgba(200,80,255,0.3)',
+  ];
+  cbColors.forEach((cc, ci) => {
+    ctx.strokeStyle = cc;
+    ctx.lineWidth   = 2 * dp;
+    ctx.beginPath();
+    ctx.moveTo(rx + pad + ci * 6*dp, ry + rh - 18*dp);
+    ctx.lineTo(rx + pad + ci * 6*dp, ry + rh);
+    ctx.stroke();
+  });
+}
+
+function drawWallMonitor(mx, my, mw, mh, dp, time, type) {
+  // Bezel
+  ctx.fillStyle = '#06080f';
+  ctx.fillRect(mx, my, mw, mh);
+  ctx.strokeStyle = 'rgba(0,140,240,0.38)';
+  ctx.lineWidth   = 2 * dp;
+  ctx.strokeRect(mx, my, mw, mh);
+
+  const p  = 4 * dp;
+  const sx = mx + p, sy = my + p;
+  const sw = mw - 2*p, sh = mh - 2*p;
+
+  if (type === 'alert') {
+    // Red alert screen — threat detected
+    ctx.fillStyle = 'rgba(30,0,8,0.95)';
+    ctx.fillRect(sx, sy, sw, sh);
+    const bl = 0.5 + 0.5 * Math.abs(Math.sin(time / 460));
+    ctx.fillStyle = `rgba(255,20,50,${bl * 0.18})`;
+    ctx.fillRect(sx, sy, sw, sh);
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(255,50,70,${bl})`;
+    ctx.font = `bold ${7*dp}px monospace`;
+    ctx.fillText('! THREAT DETECTED', sx + sw/2, sy + sh*0.28);
+    ctx.font = `${5*dp}px monospace`;
+    ctx.fillStyle = `rgba(255,130,100,${bl * 0.75})`;
+    ctx.fillText('MALWARE ACTIVE', sx + sw/2, sy + sh*0.48);
+    ctx.fillText('DEFENSE BREACH', sx + sw/2, sy + sh*0.63);
+    ctx.fillText('ISOLATE THREAT', sx + sw/2, sy + sh*0.78);
+    // Alert bar (top)
+    ctx.fillStyle = `rgba(255,30,50,${bl * 0.4})`;
+    ctx.fillRect(sx, sy, sw, 4*dp);
+
+  } else if (type === 'code') {
+    // Green terminal / code screen
+    ctx.fillStyle = 'rgba(0,10,3,0.97)';
+    ctx.fillRect(sx, sy, sw, sh);
+    const codeLines = [
+      '> SCAN --deep --all',
+      '01101000 01100001',
+      '> FIREWALL: ACTIVE',
+      '11001010 00110011',
+      '> TRACING ORIGIN...',
+      '10101010 11110000',
+      '> ANALYZING PAYLOAD',
+    ];
+    ctx.textAlign = 'left';
+    ctx.font = `${5*dp}px monospace`;
+    codeLines.forEach((line, li) => {
+      const la = 0.5 + 0.3 * Math.sin(time / 700 + li * 0.8);
+      ctx.fillStyle = `rgba(0,220,80,${la})`;
+      ctx.fillText(line, sx + 3*dp, sy + 7*dp + li * 7*dp);
+    });
+    // Cursor blink
+    if (Math.floor(time / 500) % 2 === 0) {
+      ctx.fillStyle = 'rgba(0,255,100,0.9)';
+      ctx.fillRect(sx + 3*dp, sy + sh - 8*dp, 5*dp, 5*dp);
+    }
+
+  } else {
+    // Network graph / data monitor
+    ctx.fillStyle = 'rgba(0,4,14,0.97)';
+    ctx.fillRect(sx, sy, sw, sh);
+    // Graph line (network traffic)
+    const pts = [0, 0.5, 0.1, 0.4, 0.3, 0.7, 0.45, 0.2, 0.6, 0.65, 0.75, 0.35, 0.9, 0.55, 1.0, 0.4];
+    ctx.strokeStyle = 'rgba(0,160,255,0.55)';
+    ctx.lineWidth   = 1.5;
+    ctx.beginPath();
+    for (let pi = 0; pi < pts.length; pi += 2) {
+      const px = sx + pts[pi] * sw;
+      const py = sy + pts[pi+1] * sh;
+      if (pi === 0) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+    }
+    ctx.stroke();
+    // Data point markers (squares)
+    for (let pi = 0; pi < pts.length; pi += 2) {
+      ctx.fillStyle = 'rgba(0,200,255,0.7)';
+      ctx.fillRect(sx + pts[pi]*sw - 2*dp, sy + pts[pi+1]*sh - 2*dp, 4*dp, 4*dp);
+    }
+    // Label
+    ctx.textAlign = 'left';
+    ctx.font      = `${5*dp}px monospace`;
+    ctx.fillStyle = 'rgba(0,180,255,0.4)';
+    ctx.fillText('NET TRAFFIC', sx + 2*dp, sy + sh - 4*dp);
+  }
+
+  // Monitor stand (rectangular base)
+  ctx.fillStyle = '#05080f';
+  ctx.fillRect(mx + mw*0.38, my + mh,   mw*0.24, 5*dp);
+  ctx.fillRect(mx + mw*0.28, my + mh + 5*dp, mw*0.44, 3*dp);
+}
+
+// ── NPC Quest Intro Overlay ───────────────────────────────────
+function showNpcQuestIntro(onAccept) {
+  document.getElementById('npc-quest-intro')?.remove();
+
+  const ENEMY_NAMES = ['Trojan Virus', 'Worm Malware', 'Ransomware King'];
+  const overlay = document.createElement('div');
+  overlay.id = 'npc-quest-intro';
+  overlay.innerHTML = `
+    <div class="nqi-room">
+      <div class="nqi-content">
+
+        <div class="nqi-left">
+          <div class="nqi-npc-frame">
+            <svg class="nqi-npc-svg" width="90" height="130" viewBox="0 0 14 20"
+                xmlns="http://www.w3.org/2000/svg" style="image-rendering:pixelated">
+              <rect x="3" y="0" width="8" height="2" fill="#8888aa"/>
+              <rect x="3" y="2" width="8" height="5" fill="#f0c898"/>
+              <rect x="3" y="3" width="3" height="2" fill="none" stroke="#22266a" stroke-width="0.6"/>
+              <rect x="8" y="3" width="3" height="2" fill="none" stroke="#22266a" stroke-width="0.6"/>
+              <rect x="6" y="4" width="2" height="0.6" fill="#22266a"/>
+              <rect x="2" y="7" width="10" height="8" fill="#d8e4f8"/>
+              <rect x="5" y="7" width="4" height="3" fill="#3a5a9a"/>
+              <rect x="8" y="10" width="3" height="4" fill="#1a1a2e"/>
+              <rect x="8.5" y="10.5" width="2" height="3" fill="#00d4ff" opacity="0.4"/>
+              <rect x="4" y="15" width="3" height="4" fill="#2a3a8a"/>
+              <rect x="7" y="15" width="3" height="4" fill="#2a3a8a"/>
+              <rect x="4" y="18" width="3" height="2" fill="#181828"/>
+              <rect x="7" y="18" width="3" height="2" fill="#181828"/>
+            </svg>
+            <div class="nqi-npc-name">AGENT_7</div>
+            <div class="nqi-npc-rank">Senior Cyber Analyst</div>
+          </div>
+        </div>
+
+        <div class="nqi-right">
+          <div class="nqi-tag">// MISSION BRIEFING — DUEL ARENA</div>
+          <div class="nqi-dialog">
+            <p>Siap, Agent? Server kita sedang diinvasi oleh <em>malware dan virus</em> berbahaya yang mencoba membobol sistem pertahanan.</p>
+            <p>Gunakan pengetahuan keamanan sibermu. Setiap jawaban benar menghajar musuh — setiap kesalahan balik menyerangmu!</p>
+          </div>
+          <div class="nqi-mission-board">
+            <div class="nqi-mb-title">// TARGET THREATS</div>
+            <div class="nqi-mb-row"><span class="nqi-mb-icon">🔴</span><span>Round 1 — <b>Trojan Virus</b> (80 HP)</span></div>
+            <div class="nqi-mb-row"><span class="nqi-mb-icon">🟢</span><span>Round 2 — <b>Worm Malware</b> (104 HP)</span></div>
+            <div class="nqi-mb-row"><span class="nqi-mb-icon">👑</span><span>Round 3 — <b>Ransomware King</b> (136 HP)</span></div>
+          </div>
+          <div class="nqi-tips">
+            <span>💡 Jawab BENAR → musuh damage</span>
+            <span>⚠️ Jawab SALAH → kamu kena counter</span>
+            <span>🎮 WASD / Arrow Keys = gerak karakter</span>
+          </div>
+          <button class="nqi-accept-btn" id="nqi-accept">[ TERIMA MISI — MULAI DUEL ]</button>
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  requestAnimationFrame(() => overlay.classList.add('nqi-visible'));
+
+  document.getElementById('nqi-accept').onclick = () => {
+    overlay.classList.remove('nqi-visible');
+    overlay.classList.add('nqi-hide');
+    setTimeout(() => { overlay.remove(); onAccept(); }, 420);
+  };
 }
 
 // expose
 window.startDuel = startDuel;
 window.stopDuel = stopDuel;
 window.performDuelSkill = performDuelSkill;
-window.duelMove      = duelMove;
-window.handleDuelKey = handleDuelKey;
+window.duelMove         = duelMove;
+window.handleDuelKey    = handleDuelKey;
+window.showNpcQuestIntro = showNpcQuestIntro;
 
-export { startDuel, stopDuel, performDuelSkill, duelMove, handleDuelKey };
+export { startDuel, stopDuel, performDuelSkill, duelMove, handleDuelKey, showNpcQuestIntro };

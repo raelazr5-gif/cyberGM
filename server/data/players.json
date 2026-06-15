@@ -235,5 +235,57 @@
       },
       "shopPurchases": 0
     }
+  },
+  "szad": {
+    "name": "szad",
+    "username": "szad",
+    "fullname": "saz",
+    "email": "adada@gmail.com",
+    "avatar": "🕵️",
+    "spec": "analyst",
+    "level": 1,
+    "exp": 0,
+    "expNeeded": 100,
+    "hp": 100,
+    "maxHp": 100,
+    "stamina": 100,
+    "maxStamina": 100,
+    "credits": 500,
+    "skillPoints": 2,
+    "learnedSkills": [],
+    "inventory": [
+      "s6",
+      "s7",
+      "s8"
+    ],
+    "completedMissions": [],
+    "unlockedAchievements": [],
+    "streak": 0,
+    "researchData": {
+      "totalSessions": 0,
+      "missionsCompleted": 0,
+      "totalCorrect": 0,
+      "totalWrong": 0,
+      "falsePositive": 0,
+      "falseNegative": 0,
+      "responseTimes": [],
+      "fastestResponse": 999,
+      "decisionLog": [],
+      "threatTypeStats": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "threatTypeCorrect": {
+        "phishing": 0,
+        "social": 0,
+        "web": 0,
+        "malware": 0,
+        "scam": 0
+      },
+      "shopPurchases": 0
+    }
   }
 }

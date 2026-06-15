@@ -590,58 +590,45 @@ window.duelArenaRestart = function() {
 
 export function openBattleArena() {
 
-    const battleScreen =
-        document.getElementById('battle');
-
-    const battleMap =
-        document.getElementById('battle-map');
+    const battleScreen = document.getElementById('battle');
+    const battleMap    = document.getElementById('battle-map');
 
     if (!battleScreen || !battleMap) return;
 
     battleScreen.classList.add('duel-mode');
-
     battleMap.classList.add('duel-active');
-
     battleMap.innerHTML = '';
 
-    startDuel({
-        container: battleMap,
-        playerName: window.G?.player?.name || 'Investigator',
-        level: window.G?.player?.level || 1,
-        onVictory() {
-
-            if (window.G?.player) {
-                window.G.player.exp += 150;
-                window.G.player.credits += 300;
+    const launchDuel = () => {
+        startDuel({
+            container: battleMap,
+            playerName: window.G?.player?.name || 'Investigator',
+            level: window.G?.player?.level || 1,
+            onVictory() {
+                if (window.G?.player) {
+                    window.G.player.exp     += 150;
+                    window.G.player.credits += 300;
+                }
+                if (window.showNotification) {
+                    showNotification('success', 'MISSION SUCCESS', '+150 EXP | +300 CREDIT');
+                }
+            },
+            onDefeat() {
+                if (window.G?.player) {
+                    window.G.player.hp = Math.max(0, window.G.player.hp - 15);
+                }
+                if (window.showNotification) {
+                    showNotification('danger', 'SYSTEM BREACHED', '-15 HP');
+                }
             }
+        });
+    };
 
-            if (window.showNotification) {
-                showNotification(
-                    'success',
-                    'MISSION SUCCESS',
-                    '+150 EXP | +300 CREDIT'
-                );
-            }
-        },
-        onDefeat() {
-
-            if (window.G?.player) {
-                window.G.player.hp =
-                    Math.max(
-                        0,
-                        window.G.player.hp - 15
-                    );
-            }
-
-            if (window.showNotification) {
-                showNotification(
-                    'danger',
-                    'SYSTEM BREACHED',
-                    '-15 HP'
-                );
-            }
-        }
-    });
+    if (window.showNpcQuestIntro) {
+        window.showNpcQuestIntro(launchDuel);
+    } else {
+        launchDuel();
+    }
 }
 
 window.openBattleArena = openBattleArena;
@@ -682,7 +669,6 @@ export function buildDuelArenaHTML() {
   <div class="arena-screen-panel blue-screen"><div class="arena-screen-text">DETECTIVE<br>SIBER</div></div>
   <div class="arena-screen-panel red-screen"><div class="arena-screen-text">PENIPU<br>SIBER</div></div>
   <div class="arena-floor"></div>
-  <div class="arena-floor-circle"></div>
   <div class="arena-scanlines"></div>
 </div>
 
