@@ -712,7 +712,7 @@ function showPanel(id, navEl) {
   if(id==='panel-skills') renderSkillTree();
   if(id==='panel-inventory') renderInventory();
   if(id==='panel-shop') renderShop();
-  if(id==='panel-map') {
+  if (id === 'panel-arena') {
     const wmc = document.getElementById('world-map-container');
     if (wmc) {
       initWorldMap(wmc, (zoneId, locked) => {
@@ -720,7 +720,12 @@ function showPanel(id, navEl) {
           if (window.showNotification) showNotification('danger','ZONE LOCKED','Butuh Level 10 untuk membuka Darknet Sector.');
           return;
         }
-        goToZone(zoneId);
+        const label = document.getElementById('arena-selected-zone');
+        const names = {
+          phishing: 'PHISHING DISTRICT', social: 'SOCIAL ENG. HUB',
+          web: 'WEB THREAT SECTOR', malware: 'MALWARE QUARANTINE', scam: 'SCAM NETWORK ZONE',
+        };
+        if (label) label.textContent = `// Zone dipilih: ${names[zoneId] || zoneId.toUpperCase()} — Siap masuk arena?`;
       });
     }
   } else {
@@ -841,17 +846,6 @@ async function enterHub() {
   clockInterval = setInterval(updateClock, 1000);
   updateClock();
   setAvaHubMsg();
-  // Initialize world map on the default active panel
-  const wmc = document.getElementById('world-map-container');
-  if (wmc) {
-    initWorldMap(wmc, (zoneId, locked) => {
-      if (locked) {
-        if (window.showNotification) showNotification('danger','ZONE LOCKED','Butuh Level 10 untuk membuka Darknet Sector.');
-        return;
-      }
-      goToZone(zoneId);
-    });
-  }
 }
 function updateSidebar() {
   const p = G.player;
