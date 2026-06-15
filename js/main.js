@@ -1351,23 +1351,24 @@ function renderBattleUI() {
   renderBattleLog();
 }
 
+function buildSprite(pixels) {
+  const sprite = document.createElement('div');
+  sprite.className = 'battle-sprite pixel-sprite';
+  pixels.forEach(color => {
+    const block = document.createElement('span');
+    block.className = 'pixel-block';
+    block.style.backgroundColor = color;
+    sprite.appendChild(block);
+  });
+  return sprite;
+}
+
 function renderBattleMap() {
   const state = G.battle;
+  if (state && state.duel) return;
   const container = document.getElementById('battle-map');
   if (!container) return;
   container.innerHTML = '';
-
-  function buildSprite(pixels) {
-    const sprite = document.createElement('div');
-    sprite.className = 'battle-sprite pixel-sprite';
-    pixels.forEach(color => {
-      const block = document.createElement('span');
-      block.className = 'pixel-block';
-      block.style.backgroundColor = color;
-      sprite.appendChild(block);
-    });
-    return sprite;
-  }
 
   for (let y = 0; y < state.height; y++) {
     for (let x = 0; x < state.width; x++) {
@@ -1479,13 +1480,28 @@ function checkBattleState() {
   return false;
 }
 
+const DUEL_KEYS = new Set(['ArrowLeft','ArrowRight','ArrowUp','a','d','w','A','D','W',' ']);
+
 window.addEventListener('keydown', (event) => {
   if (!G.battle) return;
+  // In duel mode: send key to duel movement engine — NOT battleMove (which deals damage)
+  if (G.battle.duel) {
+    if (DUEL_KEYS.has(event.key)) {
+      event.preventDefault();
+      if (window.handleDuelKey) window.handleDuelKey(event.key, true);
+    }
+    return;
+  }
   const map = { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' };
   if (map[event.key]) {
     event.preventDefault();
     battleMove(map[event.key]);
   }
+});
+
+window.addEventListener('keyup', (event) => {
+  if (!G.battle || !G.battle.duel) return;
+  if (window.handleDuelKey) window.handleDuelKey(event.key, false);
 });
 window.openBattleArena = openBattleArena;
 window.exitBattle = exitBattle;

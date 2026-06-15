@@ -160,22 +160,6 @@
   border-top: 2px solid rgba(0,255,240,0.1);
 }
 
-/* Arena circle on floor */
-.arena-floor-circle {
-  position: absolute;
-  bottom: 28%;
-  left: 50%; transform: translateX(-50%);
-  width: 340px; height: 90px;
-  border-radius: 50%;
-  background: radial-gradient(ellipse, rgba(26,111,255,0.07) 0%, rgba(255,34,68,0.05) 50%, transparent 70%);
-  border: 1px solid rgba(120,120,255,0.18);
-}
-.arena-floor-circle::before {
-  content:'';
-  position:absolute; inset:10px;
-  border-radius:50%;
-  border:1px solid rgba(255,34,68,0.12);
-}
 
 /* Scanlines */
 .arena-scanlines {
@@ -237,23 +221,60 @@
 
 /* ── Character cards ─────────────────────────────────────────── */
 .battle-card {
-  width: 136px;
+  width: 168px;
   flex-shrink: 0;
   background: rgba(5,12,30,0.94);
   border: 1px solid rgba(0,255,240,0.22);
-  padding: 8px;
+  padding: 10px 8px;
+  backdrop-filter: blur(6px);
 }
 
 .battle-card.battle-enemy-card {
   border-color: rgba(255,34,68,0.3);
 }
 
+/* Glowing ring around portrait */
+.portrait-glow-ring {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 8px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.portrait-glow-ring.player-ring {
+  background: rgba(0,255,240,0.05);
+  border: 2px solid rgba(0,255,240,0.3);
+  box-shadow: 0 0 14px rgba(0,255,240,0.18), inset 0 0 10px rgba(0,255,240,0.06);
+  animation: ringPulsePlayer 2.4s ease-in-out infinite;
+}
+
+.portrait-glow-ring.enemy-ring {
+  background: rgba(255,34,68,0.05);
+  border: 2px solid rgba(255,34,68,0.35);
+  box-shadow: 0 0 14px rgba(255,34,68,0.2), inset 0 0 10px rgba(255,34,68,0.06);
+  animation: ringPulseEnemy 2.4s ease-in-out infinite;
+}
+
+@keyframes ringPulsePlayer {
+  0%,100% { box-shadow: 0 0 10px rgba(0,255,240,0.18), inset 0 0 8px rgba(0,255,240,0.05); }
+  50%      { box-shadow: 0 0 22px rgba(0,255,240,0.38), inset 0 0 14px rgba(0,255,240,0.1); }
+}
+
+@keyframes ringPulseEnemy {
+  0%,100% { box-shadow: 0 0 10px rgba(255,34,68,0.2),  inset 0 0 8px rgba(255,34,68,0.05); }
+  50%      { box-shadow: 0 0 22px rgba(255,34,68,0.42), inset 0 0 14px rgba(255,34,68,0.1); }
+}
+
 .battle-portrait {
-  width: 116px;
-  height: 116px;
-  background: rgba(0,20,60,0.5);
-  border: 1px solid rgba(0,200,255,0.18);
-  margin: 0 auto 7px;
+  width: 104px;
+  height: 104px;
+  background: rgba(0,20,60,0.6);
+  border: 1px solid rgba(0,200,255,0.22);
+  border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,53 +283,27 @@
 }
 
 .battle-enemy-card .battle-portrait {
-  border-color: rgba(255,30,60,0.18);
-  background: rgba(40,0,20,0.5);
+  border-color: rgba(255,30,60,0.22);
+  background: rgba(40,0,20,0.6);
 }
 
-/* Pixel-art character SVGs */
-.char-svg {
-  image-rendering: pixelated;
-  image-rendering: crisp-edges;
+/* Idle float animation for portrait sprites */
+.battle-portrait .battle-sprite {
+  animation: portraitFloat 2.2s ease-in-out infinite;
 }
 
-/* Idle animations */
-.char-svg.player-idle {
-  animation: charIdlePlayer 0.9s steps(2) infinite;
-}
-.char-svg.enemy-idle {
-  animation: charIdleEnemy 0.9s steps(2) infinite;
-  transform: scaleX(-1);
+.battle-enemy-card .battle-portrait .battle-sprite {
+  animation: portraitFloatEnemy 2.2s ease-in-out infinite;
 }
 
-@keyframes charIdlePlayer {
-  0%,100% { transform: translateY(0); }
-  50%      { transform: translateY(-4px); }
-}
-@keyframes charIdleEnemy {
-  0%,100% { transform: translateY(0) scaleX(-1); }
-  50%      { transform: translateY(-4px) scaleX(-1); }
+@keyframes portraitFloat {
+  0%,100% { transform: translateY(0); filter: drop-shadow(0 4px 12px rgba(0,255,240,0.45)); }
+  50%      { transform: translateY(-6px); filter: drop-shadow(0 10px 20px rgba(0,255,240,0.7)); }
 }
 
-/* Attack animations */
-.char-svg.player-attacking {
-  animation: charAttackPlayer 0.55s ease forwards;
-}
-.char-svg.enemy-attacking {
-  animation: charAttackEnemy 0.55s ease forwards;
-}
-
-@keyframes charAttackPlayer {
-  0%   { transform: translateX(0); }
-  35%  { transform: translateX(44px); }
-  65%  { transform: translateX(0); }
-  100% { transform: translateX(0); animation-name: charIdlePlayer; }
-}
-@keyframes charAttackEnemy {
-  0%   { transform: translateX(0) scaleX(-1); }
-  35%  { transform: translateX(-44px) scaleX(-1); }
-  65%  { transform: translateX(0) scaleX(-1); }
-  100% { transform: translateX(0) scaleX(-1); animation-name: charIdleEnemy; }
+@keyframes portraitFloatEnemy {
+  0%,100% { transform: translateY(0); filter: drop-shadow(0 4px 12px rgba(255,34,68,0.45)); }
+  50%      { transform: translateY(-6px); filter: drop-shadow(0 10px 20px rgba(255,34,68,0.7)); }
 }
 
 /* Hit flash */
@@ -388,6 +383,23 @@
 }
 .battle-status-badge.shield { border-color: rgba(0,255,240,0.5); color: var(--cyan,#00fff0); }
 .battle-status-badge.burn   { border-color: rgba(255,80,0,0.5);  color: #ff8800; }
+
+/* ── Arena control buttons ───────────────────────────────────── */
+.arena-ctrl {
+  width: 38px;
+  height: 38px;
+  font-size: 16px;
+  border-radius: 8px !important;
+  background: rgba(0,30,70,0.85) !important;
+  border-color: rgba(0,255,240,0.35) !important;
+  color: var(--cyan,#00fff0) !important;
+  box-shadow: 0 0 10px rgba(0,255,240,0.15);
+  transition: background 0.12s, box-shadow 0.12s;
+}
+.arena-ctrl:hover {
+  background: rgba(0,80,160,0.7) !important;
+  box-shadow: 0 0 18px rgba(0,255,240,0.35) !important;
+}
 
 /* ── Stage center ────────────────────────────────────────────── */
 .battle-stage-panel {
@@ -634,3 +646,112 @@
   margin-top: 6px;
 }
 .battle-btn-restart:hover { background: rgba(0,160,200,0.3); }
+
+/* ── Duel action bar — 6 skill cards ───────────────────────── */
+.duel-action-bar {
+  display: grid !important;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+  padding: 8px 10px !important;
+  background: rgba(2,8,20,0.96) !important;
+  border-top: 1px solid rgba(0,255,240,0.18) !important;
+}
+
+/* Base skill card */
+.dsk {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 4px 6px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: rgba(8,18,40,0.9);
+  transition: transform 0.1s, box-shadow 0.18s, background 0.15s;
+  user-select: none;
+  min-height: 68px;
+  position: relative;
+  overflow: hidden;
+}
+.dsk::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, transparent 60%);
+  border-radius: inherit;
+  pointer-events: none;
+}
+.dsk:active { transform: scale(0.92); }
+.dsk:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.dsk-icon {
+  font-size: 20px;
+  line-height: 1;
+  filter: drop-shadow(0 0 4px currentColor);
+}
+.dsk-name {
+  font-family: var(--hud, 'Orbitron', monospace);
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+  line-height: 1.2;
+}
+.dsk-eff {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px;
+  opacity: 0.7;
+  margin-top: 1px;
+}
+
+/* Scan Email — cyan */
+.dsk-scan {
+  border-color: rgba(0,220,255,0.4);
+  color: #00d8ff;
+}
+.dsk-scan:hover { background: rgba(0,180,255,0.15); box-shadow: 0 0 16px rgba(0,200,255,0.35); }
+
+/* Analyze — blue */
+.dsk-analyze {
+  border-color: rgba(60,120,255,0.45);
+  color: #6699ff;
+}
+.dsk-analyze:hover { background: rgba(60,100,255,0.15); box-shadow: 0 0 16px rgba(80,120,255,0.35); }
+
+/* Sandbox — orange */
+.dsk-sandbox {
+  border-color: rgba(255,140,30,0.5);
+  color: #ffaa44;
+}
+.dsk-sandbox:hover { background: rgba(255,130,20,0.15); box-shadow: 0 0 16px rgba(255,140,30,0.4); }
+
+/* Firewall — purple */
+.dsk-firewall {
+  border-color: rgba(160,80,255,0.45);
+  color: #cc88ff;
+}
+.dsk-firewall:hover { background: rgba(140,60,255,0.15); box-shadow: 0 0 16px rgba(160,80,255,0.35); }
+
+/* Incident Response — green heal */
+.dsk-incident {
+  border-color: rgba(0,220,120,0.45);
+  color: #00ee88;
+}
+.dsk-incident:hover { background: rgba(0,180,100,0.15); box-shadow: 0 0 16px rgba(0,220,120,0.35); }
+
+/* Isolate Threat — gold/electric */
+.dsk-isolate {
+  border-color: rgba(255,210,0,0.5);
+  color: #ffdd22;
+  background: rgba(30,20,0,0.9);
+}
+.dsk-isolate:hover { background: rgba(255,200,0,0.12); box-shadow: 0 0 18px rgba(255,210,0,0.45); }
+
+/* pulse ring on active skill card */
+@keyframes dskPulse {
+  0%,100% { box-shadow: 0 0 8px currentColor; }
+  50%      { box-shadow: 0 0 22px currentColor; }
+}
+.dsk-active { animation: dskPulse 1.2s ease-in-out infinite; }

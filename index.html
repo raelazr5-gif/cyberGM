@@ -346,15 +346,45 @@
 </div>
 
 <div class="screen" id="battle">
+
+  <!-- ── Arena decorative background ── -->
+  <div class="arena-bg">
+    <div class="arena-back-wall"></div>
+    <div class="arena-wall-panel left"></div>
+    <div class="arena-wall-panel right"></div>
+    <div class="arena-wall-panel center">
+      <div class="arena-center-sign">
+        <div class="sign-lock"></div>
+        <div class="arena-sign-title">DUEL<br>ARENA</div>
+      </div>
+    </div>
+    <div class="arena-banner blue"><div class="arena-banner-text">CYBER<br>GUARD</div></div>
+    <div class="arena-banner red"><div class="arena-banner-text">ROGUE<br>AI</div></div>
+    <div class="arena-screen-panel blue-screen"><div class="arena-screen-text">AGENT_STATS<br>HP_FULL<br>STANDBY</div></div>
+    <div class="arena-screen-panel red-screen"><div class="arena-screen-text">ROGUE_AI<br>THREAT_LVL<br>CRITICAL</div></div>
+    <div class="arena-floor"></div>
+    <div class="arena-scanlines"></div>
+  </div>
+
+  <!-- ── Floating damage / effect text layer ── -->
+  <div class="battle-effect-layer" id="battle-effect-layer"></div>
+
+  <!-- ── Top HUD ── -->
   <div class="battle-topbar">
     <button class="btn btn-sm" onclick="exitBattle()">← KEMBALI</button>
     <div class="battle-title">DUEL ARENA</div>
     <div class="battle-turn" id="battle-turn-label">TURN 1</div>
   </div>
+
+  <!-- ── Main battle area ── -->
   <div class="battle-area">
+
+    <!-- Player side -->
     <div class="battle-side battle-player-side">
       <div class="battle-card battle-player-card">
-        <div class="battle-portrait" id="battle-player-avatar">🕵️</div>
+        <div class="portrait-glow-ring player-ring">
+          <div class="battle-portrait" id="battle-player-avatar">🕵️</div>
+        </div>
         <div class="battle-name" id="battle-player-name">AGENT</div>
         <div class="battle-bar-row">
           <div class="battle-bar-label">HP</div>
@@ -362,26 +392,68 @@
           <div class="battle-bar-value" id="battle-player-hp-val">100/100</div>
         </div>
         <div class="battle-bar-row">
-          <div class="battle-bar-label">Stamina</div>
+          <div class="battle-bar-label">STA</div>
           <div class="bar-track battle-bar-track"><div class="bar-fill sta-fill-bar" id="battle-player-sta-bar" style="width:100%"></div></div>
           <div class="battle-bar-value" id="battle-player-sta-val">100/100</div>
         </div>
       </div>
     </div>
+
+    <!-- Center stage -->
     <div class="battle-stage-panel">
+      <div class="battle-vs-badge">VS</div>
+      <div class="battle-round-label" id="battle-round-label">ROUND 1</div>
       <div class="battle-stage-frame">
         <div class="battle-stage" id="battle-map"></div>
       </div>
       <div class="battle-controls-row">
-        <button class="btn btn-sm" onclick="battleMove('up')">↑</button>
-        <button class="btn btn-sm" onclick="battleMove('left')">←</button>
-        <button class="btn btn-sm" onclick="battleMove('down')">↓</button>
-        <button class="btn btn-sm" onclick="battleMove('right')">→</button>
+        <button class="btn btn-sm arena-ctrl" onclick="battleMove('up')">↑</button>
+        <button class="btn btn-sm arena-ctrl" onclick="battleMove('left')">←</button>
+        <button class="btn btn-sm arena-ctrl" onclick="battleMove('down')">↓</button>
+        <button class="btn btn-sm arena-ctrl" onclick="battleMove('right')">→</button>
+      </div>
+
+      <!-- Duel-mode skill cards (hidden outside duel) -->
+      <div class="duel-action-bar" id="duel-action-bar">
+        <button class="dsk dsk-scan"     onclick="window.performDuelSkill('scan')">
+          <span class="dsk-icon">📧</span>
+          <span class="dsk-name">SCAN EMAIL</span>
+          <span class="dsk-eff">−18 HP</span>
+        </button>
+        <button class="dsk dsk-analyze"  onclick="window.performDuelSkill('analyze')">
+          <span class="dsk-icon">🔍</span>
+          <span class="dsk-name">ANALYZE</span>
+          <span class="dsk-eff">−26 HP</span>
+        </button>
+        <button class="dsk dsk-sandbox"  onclick="window.performDuelSkill('sandbox')">
+          <span class="dsk-icon">🖥️</span>
+          <span class="dsk-name">SANDBOX</span>
+          <span class="dsk-eff">−38 HP</span>
+        </button>
+        <button class="dsk dsk-firewall" onclick="window.performDuelSkill('firewall')">
+          <span class="dsk-icon">🛡️</span>
+          <span class="dsk-name">FIREWALL</span>
+          <span class="dsk-eff">DEF +</span>
+        </button>
+        <button class="dsk dsk-incident" onclick="window.performDuelSkill('incident')">
+          <span class="dsk-icon">🚨</span>
+          <span class="dsk-name">INCIDENT</span>
+          <span class="dsk-eff">+20 HP</span>
+        </button>
+        <button class="dsk dsk-isolate"  onclick="window.performDuelSkill('isolate')">
+          <span class="dsk-icon">⚡</span>
+          <span class="dsk-name">ISOLATE</span>
+          <span class="dsk-eff">−50 HP</span>
+        </button>
       </div>
     </div>
+
+    <!-- Enemy side -->
     <div class="battle-side battle-enemy-side">
       <div class="battle-card battle-enemy-card">
-        <div class="battle-portrait battle-enemy-avatar" id="battle-enemy-avatar">🤖</div>
+        <div class="portrait-glow-ring enemy-ring">
+          <div class="battle-portrait battle-enemy-avatar" id="battle-enemy-avatar">🤖</div>
+        </div>
         <div class="battle-name" id="battle-enemy-name">ROGUE AI</div>
         <div class="battle-bar-row">
           <div class="battle-bar-label">HP</div>
@@ -394,7 +466,10 @@
         </div>
       </div>
     </div>
-  </div>
+
+  </div><!-- /.battle-area -->
+
+  <!-- ── Footer: skills + log ── -->
   <div class="battle-footer">
     <div class="battle-skills-panel">
       <div class="battle-panel-title">SKILLS</div>
@@ -405,6 +480,7 @@
       <div id="battle-log" class="battle-log"></div>
     </div>
   </div>
+
 </div>
 
 <!-- ══════════════════════════════════════
