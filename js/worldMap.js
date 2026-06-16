@@ -674,6 +674,93 @@ function drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, time) {
   ctx.fillText(`[${zone.diff}]`, cx, lblY - lines.length * lineH - 2);
 }
 
+/* ── Player pixel-art sprite renderer ──────────────────────── */
+function drawPlayerSprite(ctx, px, py, dir, frame, time) {
+  // px, py = top-left of the tile (CSS pixels), tile = 16×16
+  const x = Math.round(px);
+  const y = Math.round(py);
+
+  // Glow halo
+  const glowA = 0.18 + 0.08 * Math.sin(time / 20);
+  ctx.fillStyle = `rgba(0,210,255,${glowA})`;
+  ctx.beginPath();
+  ctx.ellipse(x + 8, y + 14, 5, 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // === LEGS ===
+  ctx.fillStyle = '#071525';
+  const legLeft  = x + (frame === 1 ? 3 : frame === 3 ? 5 : 4);
+  const legRight = x + (frame === 1 ? 9 : frame === 3 ? 8 : 9);
+  const legLY    = y + (frame === 1 ? 11 : frame === 3 ? 12 : 11);
+  const legRY    = y + (frame === 1 ? 12 : frame === 3 ? 11 : 11);
+  ctx.fillRect(legLeft,  legLY, 3, 3);
+  ctx.fillRect(legRight, legRY, 3, 3);
+  // Foot neon
+  ctx.fillStyle = '#0077cc';
+  ctx.fillRect(legLeft,  legLY + 2, 3, 1);
+  ctx.fillRect(legRight, legRY + 2, 3, 1);
+
+  // === BODY ===
+  ctx.fillStyle = '#071830';
+  ctx.fillRect(x + 4, y + 7, 8, 6);
+  // Neon chest strip
+  ctx.fillStyle = '#00b4ff';
+  ctx.fillRect(x + 5, y + 8, 6, 1);
+  ctx.fillRect(x + 6, y + 10, 4, 1);
+  // Body outline
+  ctx.strokeStyle = '#004477';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 4, y + 7, 8, 6);
+
+  // === ARMS ===
+  ctx.fillStyle = '#06102a';
+  const armSwing = (frame % 2 === 0) ? 0 : 1;
+  ctx.fillRect(x + 2, y + 7 + armSwing,     2, 4 - armSwing);  // left
+  ctx.fillRect(x + 12, y + 7 + 1 - armSwing, 2, 4 - (1 - armSwing)); // right
+
+  // === HEAD ===
+  ctx.fillStyle = '#041225';
+  ctx.fillRect(x + 3, y + 1, 10, 6);
+
+  // Visor
+  if (dir === 2) {           // facing down  → full face
+    ctx.fillStyle = 'rgba(0,180,255,0.22)';
+    ctx.fillRect(x + 4, y + 2, 8, 4);
+    ctx.fillStyle = '#00ffee';
+    ctx.fillRect(x + 5, y + 3, 2, 2);   // left eye
+    ctx.fillRect(x + 9, y + 3, 2, 2);   // right eye
+  } else if (dir === 0) {    // facing up    → back of helmet
+    ctx.fillStyle = '#031020';
+    ctx.fillRect(x + 3, y + 1, 10, 6);
+    ctx.fillStyle = '#004466';
+    ctx.fillRect(x + 5, y + 2, 6, 3);
+  } else if (dir === 1) {    // facing right → right profile
+    ctx.fillStyle = 'rgba(0,180,255,0.22)';
+    ctx.fillRect(x + 5, y + 2, 6, 4);
+    ctx.fillStyle = '#00ffee';
+    ctx.fillRect(x + 9, y + 3, 2, 2);
+  } else {                   // facing left  → left profile
+    ctx.fillStyle = 'rgba(0,180,255,0.22)';
+    ctx.fillRect(x + 5, y + 2, 6, 4);
+    ctx.fillStyle = '#00ffee';
+    ctx.fillRect(x + 5, y + 3, 2, 2);
+  }
+  // Helmet outline
+  ctx.strokeStyle = '#0066aa';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(x + 3, y + 1, 10, 6);
+
+  // Antenna
+  ctx.fillStyle = '#0055aa';
+  ctx.fillRect(x + 10, y + 0, 1, 2);
+  ctx.fillStyle = (time % 30 < 15) ? '#ff4444' : '#ff9999';
+  ctx.fillRect(x + 10, y + 0, 1, 1);
+
+  // Name tag glow (subtle)
+  ctx.fillStyle = `rgba(0,180,255,${0.06 + 0.04 * Math.sin(time / 15)})`;
+  ctx.fillRect(x + 3, y + 1, 10, 13);
+}
+
 /* ── WorldMap class ─────────────────────────────────────────── */
 class WorldMap {
   constructor(container, onZoneClick) {
@@ -690,6 +777,20 @@ class WorldMap {
     this.dragX = 0; this.dragY = 0;
     this.camDragX = 0; this.camDragY = 0;
     this.cssW = 480; this.cssH = 320;
+
+    // Player
+    this.player = {
+      tx: 30, ty: 26,       // current tile position
+      prevTx: 30, prevTy: 26, // tile before last step
+      dir: 2,               // 0=up 1=right 2=down 3=left
+      frame: 0,             // 0–3 walk animation
+      t: 1.0,               // 0=step start → 1=arrived
+      STEP: 8,              // ticks per tile step
+    };
+    this._currentZone = null;   // zone player is standing in
+    this._keys = {};
+    this._onKeyDown = null;
+    this._onKeyUp   = null;
   }
 
   init() {
@@ -719,9 +820,59 @@ class WorldMap {
     this.cssW = w; this.cssH = h;
   }
 
+  _isWalkable(tx, ty) {
+    if (tx < 0 || ty < 0 || tx >= MW || ty >= MH) return false;
+    const t = this.map[ty][tx];
+    return t !== T.VOID      && t !== T.SERVER    &&
+           t !== T.FIREWALL_H && t !== T.FIREWALL_V &&
+           t !== T.DATA_TOWER && t !== T.ANTENNA   && t !== T.DARK_WALL;
+  }
+
+  _updatePlayer() {
+    const p = this.player;
+    // Advance step interpolation
+    if (p.t < 1.0) {
+      p.t = Math.min(1.0, p.t + 1 / p.STEP);
+      // Camera smoothly follows player during movement
+      const drawTx = p.prevTx + (p.tx - p.prevTx) * p.t;
+      const drawTy = p.prevTy + (p.ty - p.prevTy) * p.t;
+      this.targetCamX = drawTx - this.cssW / TS / 2 + 0.5;
+      this.targetCamY = drawTy - this.cssH / TS / 2 + 0.5;
+      this._clampCamera();
+      return;
+    }
+    // Read input
+    const k = this._keys;
+    let dx = 0, dy = 0;
+    if      (k['ArrowLeft']  || k['KeyA']) { dx = -1; p.dir = 3; }
+    else if (k['ArrowRight'] || k['KeyD']) { dx =  1; p.dir = 1; }
+    else if (k['ArrowUp']    || k['KeyW']) { dy = -1; p.dir = 0; }
+    else if (k['ArrowDown']  || k['KeyS']) { dy =  1; p.dir = 2; }
+    if (!dx && !dy) return;
+
+    const nx = p.tx + dx, ny = p.ty + dy;
+    if (this._isWalkable(nx, ny)) {
+      p.prevTx = p.tx; p.prevTy = p.ty;
+      p.tx = nx; p.ty = ny;
+      p.t = 0;
+      p.frame = (p.frame + 1) % 4;
+      // Zone detection on entry
+      const entered = ZONES.find(z =>
+        Math.abs(nx - z.cx) <= z.rw && Math.abs(ny - z.cy) <= z.rh);
+      const zoneId = entered?.id ?? null;
+      if (zoneId !== this._currentZone) {
+        this._currentZone = zoneId;
+        if (entered) this.onZoneClick(entered.id, entered.locked);
+      }
+    } else {
+      // Face the blocked direction but stay put
+    }
+  }
+
   _tick() {
     this.raf = requestAnimationFrame(() => this._tick());
     this.time++;
+    this._updatePlayer();
     const spd = 0.10;
     this.camX += (this.targetCamX - this.camX) * spd;
     this.camY += (this.targetCamY - this.camY) * spd;
@@ -795,6 +946,14 @@ class WorldMap {
       drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, this.time);
     });
 
+    // Player sprite
+    const p = this.player;
+    const drawTx = p.prevTx + (p.tx - p.prevTx) * p.t;
+    const drawTy = p.prevTy + (p.ty - p.prevTy) * p.t;
+    const spritePx = (drawTx - this.camX) * ts;
+    const spritePy = (drawTy - this.camY) * ts;
+    drawPlayerSprite(ctx, spritePx, spritePy, p.dir, p.frame, this.time);
+
     // CRT scanline overlay
     ctx.fillStyle = 'rgba(0,0,0,0.06)';
     for (let sy = 0; sy < h; sy += 3) ctx.fillRect(0, sy, w, 1);
@@ -816,6 +975,17 @@ class WorldMap {
 
   _bindEvents() {
     const c = this.canvas;
+
+    // Keyboard — WASD + arrow keys for player movement
+    this._onKeyDown = e => {
+      this._keys[e.code] = true;
+      const navKeys = ['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'];
+      if (navKeys.includes(e.key)) e.preventDefault();
+    };
+    this._onKeyUp = e => { delete this._keys[e.code]; };
+    window.addEventListener('keydown', this._onKeyDown);
+    window.addEventListener('keyup',   this._onKeyUp);
+
     c.addEventListener('mousedown', e => {
       this.drag = true;
       this.dragX = e.clientX; this.dragY = e.clientY;
@@ -880,6 +1050,9 @@ class WorldMap {
 
   destroy() {
     if (this.raf) cancelAnimationFrame(this.raf);
+    if (this._onKeyDown) window.removeEventListener('keydown', this._onKeyDown);
+    if (this._onKeyUp)   window.removeEventListener('keyup',   this._onKeyUp);
+    this._keys = {};
     this.canvas?.remove();
     this.canvas = null;
   }
