@@ -30,6 +30,14 @@ const T = {
 const MW = 64;
 const MH = 52;
 const TS = 16;
+const RS = 2;   // render scale — tiles draw at TS*RS = 32 px each
+
+/* ── Enemy definitions ──────────────────────────────────────── */
+const ENEMIES_DEF = [
+  { id:'trojan',     type:0, startTx:11, startTy:20, patrolR:9  },
+  { id:'worm',       type:1, startTx:52, startTy:20, patrolR:9  },
+  { id:'ransomware', type:2, startTx:32, startTy:36, patrolR:8  },
+];
 
 /* ── Zone definitions ───────────────────────────────────────── */
 const ZONES = [
@@ -608,11 +616,12 @@ function drawTile(ctx, tile, px, py, ts, tx, ty) {
 }
 
 /* ── Zone overlay renderer ──────────────────────────────────── */
-function drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, time) {
+function drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, time, inZone = false) {
   const cx = screenOX + zone.cx * ts;
   const cy = screenOY + zone.cy * ts;
 
-  const pulse = 0.55 + 0.45 * Math.sin(time / 500 + zone.cx * 0.7);
+  const basePulse = 0.55 + 0.45 * Math.sin(time / 500 + zone.cx * 0.7);
+  const pulse = inZone ? 0.75 + 0.25 * Math.sin(time / 12) : basePulse;
   const col   = zone.color;
 
   // Zone glow rectangle
@@ -674,91 +683,418 @@ function drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, time) {
   ctx.fillText(`[${zone.diff}]`, cx, lblY - lines.length * lineH - 2);
 }
 
-/* ── Player pixel-art sprite renderer ──────────────────────── */
+/* ── Player pixel-art sprite (32×32 at RS=2) ───────────────── */
 function drawPlayerSprite(ctx, px, py, dir, frame, time) {
-  // px, py = top-left of the tile (CSS pixels), tile = 16×16
+  // px, py = top-left of the 32×32 tile (CSS pixels)
   const x = Math.round(px);
   const y = Math.round(py);
+  const s = RS; // scale factor (2)
 
-  // Glow halo
-  const glowA = 0.18 + 0.08 * Math.sin(time / 20);
+  // Glow shadow ellipse
+  const glowA = 0.22 + 0.10 * Math.sin(time / 18);
   ctx.fillStyle = `rgba(0,210,255,${glowA})`;
   ctx.beginPath();
-  ctx.ellipse(x + 8, y + 14, 5, 2, 0, 0, Math.PI * 2);
+  ctx.ellipse(x + 16*s, y + 28*s, 9*s, 4*s, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // === LEGS ===
+  // === LEGS (walk animation) ===
   ctx.fillStyle = '#071525';
-  const legLeft  = x + (frame === 1 ? 3 : frame === 3 ? 5 : 4);
-  const legRight = x + (frame === 1 ? 9 : frame === 3 ? 8 : 9);
-  const legLY    = y + (frame === 1 ? 11 : frame === 3 ? 12 : 11);
-  const legRY    = y + (frame === 1 ? 12 : frame === 3 ? 11 : 11);
-  ctx.fillRect(legLeft,  legLY, 3, 3);
-  ctx.fillRect(legRight, legRY, 3, 3);
+  const lX = frame === 1 ? 6*s : frame === 3 ? 10*s : 8*s;
+  const rX = frame === 1 ? 18*s : frame === 3 ? 16*s : 18*s;
+  const lY = y + (frame === 1 ? 21*s : frame === 3 ? 23*s : 22*s);
+  const rY = y + (frame === 1 ? 23*s : frame === 3 ? 21*s : 22*s);
+  ctx.fillRect(x + lX, lY, 6*s, 7*s);
+  ctx.fillRect(x + rX, rY, 6*s, 7*s);
   // Foot neon
   ctx.fillStyle = '#0077cc';
-  ctx.fillRect(legLeft,  legLY + 2, 3, 1);
-  ctx.fillRect(legRight, legRY + 2, 3, 1);
+  ctx.fillRect(x + lX,    lY + 5*s, 7*s, 2*s);
+  ctx.fillRect(x + rX,    rY + 5*s, 7*s, 2*s);
+  // Boot highlight
+  ctx.fillStyle = '#0099ee';
+  ctx.fillRect(x + lX+1*s, lY + 5*s, 2*s, 1*s);
+  ctx.fillRect(x + rX+1*s, rY + 5*s, 2*s, 1*s);
 
   // === BODY ===
   ctx.fillStyle = '#071830';
-  ctx.fillRect(x + 4, y + 7, 8, 6);
-  // Neon chest strip
+  ctx.fillRect(x + 8*s, y + 14*s, 16*s, 12*s);
+  // Neon chest data-stripe
   ctx.fillStyle = '#00b4ff';
-  ctx.fillRect(x + 5, y + 8, 6, 1);
-  ctx.fillRect(x + 6, y + 10, 4, 1);
+  ctx.fillRect(x + 10*s, y + 16*s, 12*s, 2*s);
+  ctx.fillRect(x + 12*s, y + 20*s, 8*s, 2*s);
+  // body glow
+  ctx.fillStyle = `rgba(0,160,255,${0.08 + 0.05 * Math.sin(time/22)})`;
+  ctx.fillRect(x + 8*s, y + 14*s, 16*s, 12*s);
   // Body outline
-  ctx.strokeStyle = '#004477';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x + 4, y + 7, 8, 6);
+  ctx.strokeStyle = '#00558a';
+  ctx.lineWidth = s;
+  ctx.strokeRect(x + 8*s, y + 14*s, 16*s, 12*s);
+  // shoulder pads
+  ctx.fillStyle = '#0a2040';
+  ctx.fillRect(x + 6*s,  y + 14*s, 3*s, 4*s);
+  ctx.fillRect(x + 23*s, y + 14*s, 3*s, 4*s);
 
   // === ARMS ===
   ctx.fillStyle = '#06102a';
-  const armSwing = (frame % 2 === 0) ? 0 : 1;
-  ctx.fillRect(x + 2, y + 7 + armSwing,     2, 4 - armSwing);  // left
-  ctx.fillRect(x + 12, y + 7 + 1 - armSwing, 2, 4 - (1 - armSwing)); // right
+  const armSwing = (frame % 2 === 0) ? 0 : 2*s;
+  ctx.fillRect(x + 4*s, y + 14*s + armSwing,       4*s, 8*s - armSwing);
+  ctx.fillRect(x + 24*s, y + 14*s + (2*s - armSwing), 4*s, 8*s - (2*s - armSwing));
+  // arm neon edge
+  ctx.fillStyle = '#004488';
+  ctx.fillRect(x + 4*s, y + 14*s + armSwing,       1*s, 8*s - armSwing);
+  ctx.fillRect(x + 27*s, y + 14*s + (2*s-armSwing), 1*s, 8*s - (2*s - armSwing));
 
   // === HEAD ===
   ctx.fillStyle = '#041225';
-  ctx.fillRect(x + 3, y + 1, 10, 6);
+  ctx.fillRect(x + 6*s, y + 2*s, 20*s, 13*s);
+  // inner helmet
+  ctx.fillStyle = '#06192e';
+  ctx.fillRect(x + 7*s, y + 3*s, 18*s, 11*s);
 
-  // Visor
-  if (dir === 2) {           // facing down  → full face
-    ctx.fillStyle = 'rgba(0,180,255,0.22)';
-    ctx.fillRect(x + 4, y + 2, 8, 4);
+  // Direction-based visor
+  if (dir === 2) { // facing down — full face
+    ctx.fillStyle = 'rgba(0,180,255,0.25)';
+    ctx.fillRect(x + 8*s, y + 5*s, 16*s, 8*s);
+    // Eye glow
     ctx.fillStyle = '#00ffee';
-    ctx.fillRect(x + 5, y + 3, 2, 2);   // left eye
-    ctx.fillRect(x + 9, y + 3, 2, 2);   // right eye
-  } else if (dir === 0) {    // facing up    → back of helmet
-    ctx.fillStyle = '#031020';
-    ctx.fillRect(x + 3, y + 1, 10, 6);
+    ctx.fillRect(x + 10*s, y + 6*s, 4*s, 4*s);
+    ctx.fillRect(x + 18*s, y + 6*s, 4*s, 4*s);
+    // Eye inner bright
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + 11*s, y + 7*s, 2*s, 2*s);
+    ctx.fillRect(x + 19*s, y + 7*s, 2*s, 2*s);
+  } else if (dir === 0) { // facing up — back of helmet
+    ctx.fillStyle = '#030f1e';
+    ctx.fillRect(x + 7*s, y + 3*s, 18*s, 11*s);
     ctx.fillStyle = '#004466';
-    ctx.fillRect(x + 5, y + 2, 6, 3);
-  } else if (dir === 1) {    // facing right → right profile
-    ctx.fillStyle = 'rgba(0,180,255,0.22)';
-    ctx.fillRect(x + 5, y + 2, 6, 4);
+    ctx.fillRect(x + 10*s, y + 5*s, 12*s, 5*s);
+    ctx.fillStyle = '#002233';
+    ctx.fillRect(x + 11*s, y + 6*s, 10*s, 3*s);
+  } else if (dir === 1) { // facing right — side profile
+    ctx.fillStyle = 'rgba(0,180,255,0.2)';
+    ctx.fillRect(x + 12*s, y + 4*s, 12*s, 8*s);
     ctx.fillStyle = '#00ffee';
-    ctx.fillRect(x + 9, y + 3, 2, 2);
-  } else {                   // facing left  → left profile
-    ctx.fillStyle = 'rgba(0,180,255,0.22)';
-    ctx.fillRect(x + 5, y + 2, 6, 4);
+    ctx.fillRect(x + 19*s, y + 6*s, 4*s, 4*s);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + 20*s, y + 7*s, 2*s, 2*s);
+  } else { // facing left — side profile
+    ctx.fillStyle = 'rgba(0,180,255,0.2)';
+    ctx.fillRect(x + 8*s, y + 4*s, 12*s, 8*s);
     ctx.fillStyle = '#00ffee';
-    ctx.fillRect(x + 5, y + 3, 2, 2);
+    ctx.fillRect(x + 9*s, y + 6*s, 4*s, 4*s);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x + 10*s, y + 7*s, 2*s, 2*s);
   }
   // Helmet outline
-  ctx.strokeStyle = '#0066aa';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(x + 3, y + 1, 10, 6);
+  ctx.strokeStyle = '#0077cc';
+  ctx.lineWidth = s;
+  ctx.strokeRect(x + 6*s, y + 2*s, 20*s, 13*s);
 
-  // Antenna
+  // Antenna mast
   ctx.fillStyle = '#0055aa';
-  ctx.fillRect(x + 10, y + 0, 1, 2);
-  ctx.fillStyle = (time % 30 < 15) ? '#ff4444' : '#ff9999';
-  ctx.fillRect(x + 10, y + 0, 1, 1);
+  ctx.fillRect(x + 21*s, y + 0,    2*s, 4*s);
+  // Beacon blink
+  ctx.fillStyle = (time % 40 < 20) ? '#ff3333' : '#ff9999';
+  ctx.fillRect(x + 21*s, y + 0,    2*s, 2*s);
 
-  // Name tag glow (subtle)
-  ctx.fillStyle = `rgba(0,180,255,${0.06 + 0.04 * Math.sin(time / 15)})`;
-  ctx.fillRect(x + 3, y + 1, 10, 13);
+  // AGENT label above head
+  ctx.save();
+  ctx.font = `bold ${6*s}px "Share Tech Mono", monospace`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'bottom';
+  const labelAlpha = 0.6 + 0.4 * Math.sin(time / 25);
+  ctx.fillStyle = `rgba(0,220,255,${labelAlpha})`;
+  ctx.fillText('AGENT_7', x + 16*s, y);
+  ctx.restore();
+}
+
+/* ── Enemy pixel-art sprites (32×32) ───────────────────────── */
+function drawEnemySprite(ctx, px, py, type, frame, time, warnDist) {
+  const x = Math.round(px);
+  const y = Math.round(py);
+  const s = RS;
+  const blink = (time % 20) < 10;
+
+  // Warning pulse ring when player is close
+  if (warnDist <= 3) {
+    const warnA = warnDist <= 1 ? 0.7 : 0.35;
+    const warnCol = warnDist <= 1 ? `rgba(255,40,0,${warnA + 0.2*Math.sin(time/4)})`
+                                  : `rgba(255,150,0,${warnA + 0.1*Math.sin(time/8)})`;
+    ctx.strokeStyle = warnCol;
+    ctx.lineWidth = 2*s;
+    ctx.beginPath();
+    ctx.arc(x + 16*s, y + 16*s, 20*s + 4*s*Math.sin(time/6), 0, Math.PI*2);
+    ctx.stroke();
+  }
+
+  if (type === 0) {
+    // ═══ TROJAN ═══ (red, hooded infiltrator)
+    // Shadow
+    ctx.fillStyle = 'rgba(200,0,40,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(x+16*s, y+28*s, 9*s, 4*s, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Cloak body
+    ctx.fillStyle = '#1a0008';
+    ctx.fillRect(x+5*s, y+12*s, 22*s, 16*s);
+    // Cloak highlight/rim
+    ctx.fillStyle = '#440010';
+    ctx.fillRect(x+5*s, y+12*s, 2*s, 16*s);
+    ctx.fillRect(x+25*s, y+12*s, 2*s, 16*s);
+    // Cloak hem
+    const legOff = (frame % 2 === 0) ? 0 : s;
+    ctx.fillStyle = '#1a0008';
+    ctx.fillRect(x+5*s,  y+26*s + legOff, 7*s, 6*s);
+    ctx.fillRect(x+20*s, y+26*s - legOff, 7*s, 6*s);
+    // Red energy foot
+    ctx.fillStyle = '#cc0020';
+    ctx.fillRect(x+5*s,  y+30*s + legOff, 8*s, 2*s);
+    ctx.fillRect(x+20*s, y+30*s - legOff, 8*s, 2*s);
+    // Head / hood
+    ctx.fillStyle = '#0d0004';
+    ctx.fillRect(x+7*s, y+2*s, 18*s, 12*s);
+    ctx.fillStyle = '#1c0008';
+    ctx.fillRect(x+8*s, y+3*s, 16*s, 10*s);
+    // Red visor / eyes
+    ctx.fillStyle = blink ? '#ff0020' : '#cc0018';
+    ctx.fillRect(x+10*s, y+6*s, 4*s, 3*s);
+    ctx.fillRect(x+18*s, y+6*s, 4*s, 3*s);
+    // eye glow
+    ctx.fillStyle = `rgba(255,0,30,${0.3+0.3*Math.sin(time/10)})`;
+    ctx.fillRect(x+9*s, y+5*s, 6*s, 5*s);
+    ctx.fillRect(x+17*s, y+5*s, 6*s, 5*s);
+    // Hood outline
+    ctx.strokeStyle = '#660015';
+    ctx.lineWidth = s;
+    ctx.strokeRect(x+7*s, y+2*s, 18*s, 12*s);
+    // Type label
+    ctx.save();
+    ctx.font = `bold ${5*s}px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(255,50,80,${0.7+0.3*Math.sin(time/20)})`;
+    ctx.fillText('TROJAN', x+16*s, y);
+    ctx.restore();
+
+  } else if (type === 1) {
+    // ═══ WORM ═══ (green, segmented body)
+    // Shadow
+    ctx.fillStyle = 'rgba(0,180,0,0.18)';
+    ctx.beginPath();
+    ctx.ellipse(x+16*s, y+28*s, 9*s, 4*s, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Body segments (wriggle animation)
+    const wriggle = Math.sin(time / 8) * 2 * s;
+    const segs = [
+      { cx:16, cy:24, r:5 },
+      { cx:16+wriggle/s, cy:18, r:6 },
+      { cx:16-wriggle/s*0.5, cy:11, r:7 },
+    ];
+    for (const seg of segs) {
+      ctx.fillStyle = '#0a1e0a';
+      ctx.beginPath();
+      ctx.arc(x + seg.cx*s, y + seg.cy*s, seg.r*s, 0, Math.PI*2);
+      ctx.fill();
+      ctx.fillStyle = '#0a3a0a';
+      ctx.beginPath();
+      ctx.arc(x + seg.cx*s, y + seg.cy*s, (seg.r-1)*s, 0, Math.PI*2);
+      ctx.fill();
+      // toxic dots
+      ctx.fillStyle = `rgba(0,255,80,${0.2+0.2*Math.sin(time/12)})`;
+      ctx.beginPath();
+      ctx.arc(x + seg.cx*s, y + seg.cy*s, (seg.r-2)*s, 0, Math.PI*2);
+      ctx.fill();
+    }
+    // Head
+    ctx.fillStyle = '#0e280e';
+    ctx.beginPath();
+    ctx.arc(x+16*s, y+6*s, 7*s, 0, Math.PI*2);
+    ctx.fill();
+    // Eyes
+    ctx.fillStyle = blink ? '#00ff44' : '#00cc33';
+    ctx.fillRect(x+11*s, y+4*s, 3*s, 3*s);
+    ctx.fillRect(x+18*s, y+4*s, 3*s, 3*s);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(x+12*s, y+5*s, s, s);
+    ctx.fillRect(x+19*s, y+5*s, s, s);
+    // Toxic glow
+    ctx.strokeStyle = `rgba(0,220,60,${0.4+0.3*Math.sin(time/9)})`;
+    ctx.lineWidth = s;
+    ctx.beginPath();
+    ctx.arc(x+16*s, y+6*s, 8*s, 0, Math.PI*2);
+    ctx.stroke();
+    // Label
+    ctx.save();
+    ctx.font = `bold ${5*s}px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(0,255,80,${0.7+0.3*Math.sin(time/20)})`;
+    ctx.fillText('WORM', x+16*s, y);
+    ctx.restore();
+
+  } else {
+    // ═══ RANSOMWARE ═══ (yellow, blocky robot with lock)
+    // Shadow
+    ctx.fillStyle = 'rgba(200,160,0,0.2)';
+    ctx.beginPath();
+    ctx.ellipse(x+16*s, y+28*s, 9*s, 4*s, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Legs
+    ctx.fillStyle = '#1a1400';
+    const legOff2 = (frame % 2 === 0) ? 0 : s;
+    ctx.fillRect(x+8*s,  y+23*s + legOff2, 6*s, 8*s);
+    ctx.fillRect(x+18*s, y+23*s - legOff2, 6*s, 8*s);
+    ctx.fillStyle = '#cc8800';
+    ctx.fillRect(x+8*s,  y+28*s + legOff2, 7*s, 3*s);
+    ctx.fillRect(x+18*s, y+28*s - legOff2, 7*s, 3*s);
+    // Body
+    ctx.fillStyle = '#1e1800';
+    ctx.fillRect(x+6*s, y+12*s, 20*s, 14*s);
+    // Warning stripes
+    ctx.fillStyle = '#cc8800';
+    ctx.fillRect(x+6*s, y+12*s, 20*s, 2*s);
+    ctx.fillRect(x+6*s, y+22*s, 20*s, 2*s);
+    // Lock icon on chest
+    ctx.fillStyle = '#aa6600';
+    ctx.fillRect(x+12*s, y+15*s, 8*s, 6*s);
+    ctx.fillStyle = blink ? '#ffcc00' : '#ffaa00';
+    ctx.fillRect(x+13*s, y+16*s, 6*s, 4*s);
+    // lock shackle
+    ctx.strokeStyle = '#ffcc00';
+    ctx.lineWidth = 1.5*s;
+    ctx.beginPath();
+    ctx.arc(x+16*s, y+15*s, 3*s, Math.PI, 0);
+    ctx.stroke();
+    // Arms
+    ctx.fillStyle = '#1a1400';
+    ctx.fillRect(x+2*s, y+12*s, 5*s, 9*s);
+    ctx.fillRect(x+25*s, y+12*s, 5*s, 9*s);
+    ctx.fillStyle = '#cc8800';
+    ctx.fillRect(x+2*s, y+18*s, 6*s, 3*s);
+    ctx.fillRect(x+25*s, y+18*s, 6*s, 3*s);
+    // Head
+    ctx.fillStyle = '#1e1800';
+    ctx.fillRect(x+7*s, y+2*s, 18*s, 11*s);
+    ctx.fillStyle = '#2a2200';
+    ctx.fillRect(x+8*s, y+3*s, 16*s, 9*s);
+    // Eye visor
+    ctx.fillStyle = `rgba(255,180,0,${0.25 + 0.2*Math.sin(time/8)})`;
+    ctx.fillRect(x+9*s, y+5*s, 14*s, 5*s);
+    ctx.fillStyle = blink ? '#ffdd00' : '#ffaa00';
+    ctx.fillRect(x+10*s, y+6*s, 4*s, 3*s);
+    ctx.fillRect(x+18*s, y+6*s, 4*s, 3*s);
+    // Head outline
+    ctx.strokeStyle = '#997700';
+    ctx.lineWidth = s;
+    ctx.strokeRect(x+7*s, y+2*s, 18*s, 11*s);
+    // $ sign on head
+    ctx.save();
+    ctx.font = `bold ${7*s}px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = blink ? '#ffdd00' : '#cc9900';
+    ctx.fillText('$', x+16*s, y+11*s);
+    ctx.restore();
+    // Label
+    ctx.save();
+    ctx.font = `bold ${5*s}px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.fillStyle = `rgba(255,200,0,${0.7+0.3*Math.sin(time/20)})`;
+    ctx.fillText('RANSOM', x+16*s, y);
+    ctx.restore();
+  }
+}
+
+/* ── Minimap overlay ────────────────────────────────────────── */
+function drawMinimap(ctx, cw, ch, camX, camY, cssW, cssH, map, player, enemies) {
+  const MM_W  = 90, MM_H = 72;
+  const mx    = cw - MM_W - 8, my = 8;
+  const scaleX = MM_W / MW, scaleY = MM_H / MH;
+
+  // Background
+  ctx.fillStyle = 'rgba(4,10,24,0.88)';
+  ctx.fillRect(mx - 2, my - 2, MM_W + 4, MM_H + 4);
+  ctx.strokeStyle = '#00446a';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(mx - 2, my - 2, MM_W + 4, MM_H + 4);
+
+  // Map tiles (simplified colour coded)
+  for (let ty = 0; ty < MH; ty++) {
+    for (let tx = 0; tx < MW; tx++) {
+      const t = map[ty][tx];
+      let col = null;
+      if (t === T.VOID)                            col = '#000004';
+      else if (t === T.ENERGY_H || t === T.ENERGY_V || t === T.ENERGY_X) col = '#003a5c';
+      else if (t === T.NEXUS)                      col = '#001f4a';
+      else if (t === T.SERVER || t === T.DATA_TOWER) col = '#1a2240';
+      else if (t === T.FIREWALL_H || t === T.FIREWALL_V) col = '#2a0508';
+      else if (t === T.DARK || t === T.DARK_WALL)  col = '#0e0820';
+      else if (t === T.GLITCH)                     col = '#1a0820';
+      else                                         col = '#080c18';
+      if (col) {
+        ctx.fillStyle = col;
+        ctx.fillRect(mx + tx * scaleX, my + ty * scaleY, Math.max(1, scaleX), Math.max(1, scaleY));
+      }
+    }
+  }
+
+  // Zone markers
+  ZONES.forEach(z => {
+    ctx.strokeStyle = z.locked ? '#6620bb' : z.color;
+    ctx.lineWidth = 1;
+    ctx.strokeRect(
+      mx + (z.cx - z.rw) * scaleX, my + (z.cy - z.rh) * scaleY,
+      z.rw * 2 * scaleX, z.rh * 2 * scaleY
+    );
+  });
+
+  // Camera viewport rect
+  const visX = cssW / (TS * RS), visY = cssH / (TS * RS);
+  ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(mx + camX * scaleX, my + camY * scaleY, visX * scaleX, visY * scaleY);
+
+  // Enemy dots
+  const eDotCols = ['#ff2244','#00ff44','#ffcc00'];
+  enemies.forEach((e, i) => {
+    ctx.fillStyle = eDotCols[e.type] || '#ff8800';
+    ctx.fillRect(mx + e.tx * scaleX - 1.5, my + e.ty * scaleY - 1.5, 3, 3);
+  });
+
+  // Player dot (bright)
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(mx + player.tx * scaleX - 2, my + player.ty * scaleY - 2, 4, 4);
+  ctx.fillStyle = '#00eeff';
+  ctx.fillRect(mx + player.tx * scaleX - 1, my + player.ty * scaleY - 1, 2, 2);
+}
+
+/* ── HUD key indicators ─────────────────────────────────────── */
+function drawHudKeys(ctx, cw, ch, keys) {
+  const kx = 10, ky = ch - 64;
+  ctx.fillStyle = 'rgba(4,10,24,0.75)';
+  ctx.fillRect(kx - 4, ky - 4, 66, 60);
+  ctx.strokeStyle = '#00334a';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(kx - 4, ky - 4, 66, 60);
+
+  const drawKey = (label, x, y, active) => {
+    ctx.fillStyle = active ? 'rgba(0,180,255,0.35)' : 'rgba(10,20,40,0.8)';
+    ctx.fillRect(x, y, 18, 18);
+    ctx.strokeStyle = active ? '#00ccff' : '#224';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, 18, 18);
+    ctx.font = `bold 9px "Share Tech Mono", monospace`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillStyle = active ? '#00ffff' : '#446688';
+    ctx.fillText(label, x + 9, y + 9);
+  };
+  drawKey('W', kx + 23, ky,      keys['KeyW'] || keys['ArrowUp']);
+  drawKey('A', kx,      ky + 20, keys['KeyA'] || keys['ArrowLeft']);
+  drawKey('S', kx + 23, ky + 20, keys['KeyS'] || keys['ArrowDown']);
+  drawKey('D', kx + 46, ky + 20, keys['KeyD'] || keys['ArrowRight']);
+
+  ctx.font = '7px "Share Tech Mono", monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'top';
+  ctx.fillStyle = '#224466';
+  ctx.fillText('MOVE', kx, ky + 44);
 }
 
 /* ── WorldMap class ─────────────────────────────────────────── */
@@ -780,17 +1116,33 @@ class WorldMap {
 
     // Player
     this.player = {
-      tx: 30, ty: 26,       // current tile position
-      prevTx: 30, prevTy: 26, // tile before last step
-      dir: 2,               // 0=up 1=right 2=down 3=left
-      frame: 0,             // 0–3 walk animation
-      t: 1.0,               // 0=step start → 1=arrived
-      STEP: 8,              // ticks per tile step
+      tx: 30, ty: 26,
+      prevTx: 30, prevTy: 26,
+      dir: 2, frame: 0, t: 1.0,
+      STEP: 9,
     };
-    this._currentZone = null;   // zone player is standing in
+    this._currentZone = null;
     this._keys = {};
     this._onKeyDown = null;
     this._onKeyUp   = null;
+
+    // Enemies
+    this.enemies = ENEMIES_DEF.map(d => ({
+      tx: d.startTx, ty: d.startTy,
+      prevTx: d.startTx, prevTy: d.startTy,
+      dir: 2, frame: 0, t: 1.0,
+      type: d.type,
+      patrolCx: d.startTx, patrolCy: d.startTy, patrolR: d.patrolR,
+      moveCd: 0, MOVE_CD: 45 + d.type * 15,
+    }));
+
+    // Footstep particles
+    this.particles = [];
+
+    // Encounter
+    this.encounterFlash = 0;
+    this._encounterActive = false;
+    this._encounterCooldown = 0;
   }
 
   init() {
@@ -801,7 +1153,8 @@ class WorldMap {
     this.container.appendChild(this.canvas);
     this.ctx = this.canvas.getContext('2d', { alpha: false });
 
-    this.camX = 30 - 10; this.camY = 26 - 7;
+    // After _resize() runs, cssW/cssH will be set; estimate defaults for now
+    this.camX = 30 - 7.5; this.camY = 26 - 6.5;
     this.targetCamX = this.camX; this.targetCamY = this.camY;
 
     this._bindEvents();
@@ -836,8 +1189,8 @@ class WorldMap {
       // Camera smoothly follows player during movement
       const drawTx = p.prevTx + (p.tx - p.prevTx) * p.t;
       const drawTy = p.prevTy + (p.ty - p.prevTy) * p.t;
-      this.targetCamX = drawTx - this.cssW / TS / 2 + 0.5;
-      this.targetCamY = drawTy - this.cssH / TS / 2 + 0.5;
+      this.targetCamX = drawTx - this.cssW / (TS * RS) / 2 + 0.5;
+      this.targetCamY = drawTy - this.cssH / (TS * RS) / 2 + 0.5;
       this._clampCamera();
       return;
     }
@@ -856,6 +1209,8 @@ class WorldMap {
       p.tx = nx; p.ty = ny;
       p.t = 0;
       p.frame = (p.frame + 1) % 4;
+      // Footstep particle
+      this.particles.push({ tx: p.prevTx, ty: p.prevTy, ttl: 18, maxTtl: 18 });
       // Zone detection on entry
       const entered = ZONES.find(z =>
         Math.abs(nx - z.cx) <= z.rw && Math.abs(ny - z.cy) <= z.rh);
@@ -869,11 +1224,70 @@ class WorldMap {
     }
   }
 
+  _updateEnemies() {
+    for (const e of this.enemies) {
+      // Advance step
+      if (e.t < 1.0) {
+        e.t = Math.min(1.0, e.t + 1 / 12);
+        continue;
+      }
+      e.moveCd++;
+      if (e.moveCd < e.MOVE_CD) continue;
+      e.moveCd = 0;
+      // Pick random direction
+      const dirs = [[0,-1],[1,0],[0,1],[-1,0]];
+      const shuffled = dirs.sort(() => Math.random() - 0.5);
+      for (const [dx, dy] of shuffled) {
+        const nx = e.tx + dx, ny = e.ty + dy;
+        if (!this._isWalkable(nx, ny)) continue;
+        const distCx = Math.abs(nx - e.patrolCx);
+        const distCy = Math.abs(ny - e.patrolCy);
+        if (distCx > e.patrolR || distCy > e.patrolR) continue;
+        e.prevTx = e.tx; e.prevTy = e.ty;
+        e.tx = nx; e.ty = ny;
+        e.dir = dx < 0 ? 3 : dx > 0 ? 1 : dy < 0 ? 0 : 2;
+        e.frame = (e.frame + 1) % 4;
+        e.t = 0;
+        break;
+      }
+    }
+  }
+
+  _checkEncounters() {
+    if (this._encounterCooldown > 0) { this._encounterCooldown--; return; }
+    const p = this.player;
+    for (const e of this.enemies) {
+      const dist = Math.abs(p.tx - e.tx) + Math.abs(p.ty - e.ty);
+      if (dist <= 1) {
+        this.encounterFlash = Math.min(60, this.encounterFlash + 4);
+        if (this.encounterFlash >= 60 && !this._encounterActive) {
+          this._encounterActive = true;
+          this._encounterCooldown = 180;
+          this.encounterFlash = 0;
+          if (window.openBattleArena) window.openBattleArena();
+        }
+        return;
+      }
+    }
+    this._encounterActive = false;
+    if (this.encounterFlash > 0) this.encounterFlash = Math.max(0, this.encounterFlash - 2);
+  }
+
+  _updateParticles() {
+    for (let i = this.particles.length - 1; i >= 0; i--) {
+      this.particles[i].ttl--;
+      if (this.particles[i].ttl <= 0) this.particles.splice(i, 1);
+    }
+  }
+
   _tick() {
     this.raf = requestAnimationFrame(() => this._tick());
     this.time++;
     this._updatePlayer();
-    const spd = 0.10;
+    this._updateEnemies();
+    this._checkEncounters();
+    this._updateParticles();
+    const spd = 0.12;
     this.camX += (this.targetCamX - this.camX) * spd;
     this.camY += (this.targetCamY - this.camY) * spd;
     this._render();
@@ -883,7 +1297,7 @@ class WorldMap {
     const ctx = this.ctx;
     const w   = this.cssW || 480;
     const h   = this.cssH || 320;
-    const ts  = TS;
+    const ts  = TS * RS;   // 32px per tile
 
     const tilesX   = Math.ceil(w / ts) + 2;
     const tilesY   = Math.ceil(h / ts) + 2;
@@ -905,34 +1319,28 @@ class WorldMap {
       }
     }
 
-    // Animated energy road pulse
+    // Animated energy pulse overlay
     const pulse = (Math.sin(this.time / 30) + 1) / 2;
     for (let ty = 0; ty < tilesY; ty++) {
       for (let tx = 0; tx < tilesX; tx++) {
-        const mx = startTX + tx;
-        const my = startTY + ty;
+        const mx = startTX + tx; const my = startTY + ty;
         if (mx < 0 || my < 0 || mx >= MW || my >= MH) continue;
         const tile = this.map[my][mx];
         if (tile !== T.ENERGY_H && tile !== T.ENERGY_V && tile !== T.ENERGY_X) continue;
-        const px = tx*ts + offX;
-        const py = ty*ts + offY;
         ctx.fillStyle = `rgba(0,${180+60*pulse|0},255,${0.12 + 0.10*pulse})`;
-        ctx.fillRect(px, py, ts, ts);
+        ctx.fillRect(tx*ts + offX, ty*ts + offY, ts, ts);
       }
     }
 
-    // Animated NODE pulse
+    // NODE pulse
     for (let ty = 0; ty < tilesY; ty++) {
       for (let tx = 0; tx < tilesX; tx++) {
-        const mx = startTX + tx;
-        const my = startTY + ty;
+        const mx = startTX + tx; const my = startTY + ty;
         if (mx < 0 || my < 0 || mx >= MW || my >= MH) continue;
         if (this.map[my][mx] !== T.NODE) continue;
-        const px = tx*ts + offX;
-        const py = ty*ts + offY;
         const np = (Math.sin(this.time / 20 + mx * 0.8) + 1) / 2;
         ctx.fillStyle = `rgba(0,220,255,${0.15 + 0.25*np})`;
-        ctx.fillRect(px+3, py+3, ts-6, ts-6);
+        ctx.fillRect(tx*ts + offX + 6, ty*ts + offY + 6, ts - 12, ts - 12);
       }
     }
 
@@ -943,8 +1351,33 @@ class WorldMap {
       const zx = screenOX + (zone.cx - zone.rw) * ts;
       const zy = screenOY + (zone.cy - zone.rh) * ts;
       if (zx + zone.rw*2*ts < 0 || zx > w || zy + zone.rh*2*ts < 0 || zy > h) return;
-      drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, this.time);
+      // Boost pulse if player is inside this zone
+      const inZone = this._currentZone === zone.id;
+      drawZoneOverlay(ctx, zone, screenOX, screenOY, ts, this.time, inZone);
     });
+
+    // Footstep particles
+    for (const part of this.particles) {
+      const alpha = (part.ttl / part.maxTtl) * 0.45;
+      const ppx = (part.tx - this.camX + 0.5) * ts;
+      const ppy = (part.ty - this.camY + 0.5) * ts;
+      ctx.fillStyle = `rgba(0,200,255,${alpha})`;
+      ctx.fillRect(ppx - 3, ppy - 3, 6, 6);
+      ctx.fillStyle = `rgba(0,230,255,${alpha * 0.5})`;
+      ctx.fillRect(ppx - 5, ppy - 5, 10, 10);
+    }
+
+    // Enemy sprites
+    for (const e of this.enemies) {
+      const eTx = e.prevTx + (e.tx - e.prevTx) * e.t;
+      const eTy = e.prevTy + (e.ty - e.prevTy) * e.t;
+      const epx = (eTx - this.camX) * ts;
+      const epy = (eTy - this.camY) * ts;
+      if (epx < -ts*2 || epx > w+ts || epy < -ts*2 || epy > h+ts) continue;
+      const p = this.player;
+      const warnDist = Math.abs(p.tx - e.tx) + Math.abs(p.ty - e.ty);
+      drawEnemySprite(ctx, epx, epy, e.type, e.frame, this.time, warnDist);
+    }
 
     // Player sprite
     const p = this.player;
@@ -954,9 +1387,41 @@ class WorldMap {
     const spritePy = (drawTy - this.camY) * ts;
     drawPlayerSprite(ctx, spritePx, spritePy, p.dir, p.frame, this.time);
 
+    // Zone entry prompt (when player is in a zone)
+    if (this._currentZone) {
+      const zone = ZONES.find(z => z.id === this._currentZone);
+      if (zone) {
+        const zsPx = screenOX + zone.cx * ts;
+        const zsPy = screenOY + zone.cy * ts;
+        const promptA = 0.7 + 0.3 * Math.sin(this.time / 12);
+        ctx.save();
+        ctx.font = `bold ${RS * 6}px "Orbitron", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = `rgba(255,255,255,${promptA})`;
+        ctx.fillText('[ ENTER ARENA ]', spritePx + ts/2, spritePy - 6);
+        ctx.restore();
+      }
+    }
+
     // CRT scanline overlay
-    ctx.fillStyle = 'rgba(0,0,0,0.06)';
+    ctx.fillStyle = 'rgba(0,0,0,0.05)';
     for (let sy = 0; sy < h; sy += 3) ctx.fillRect(0, sy, w, 1);
+
+    // Encounter flash (red danger overlay)
+    if (this.encounterFlash > 0) {
+      const fa = (this.encounterFlash / 60) * 0.35;
+      ctx.fillStyle = `rgba(255,0,30,${fa})`;
+      ctx.fillRect(0, 0, w, h);
+      // Danger text
+      ctx.save();
+      ctx.font = `bold ${RS * 8}px "Orbitron", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = `rgba(255,60,60,${fa * 2.5})`;
+      ctx.fillText('⚠ THREAT DETECTED', w/2, h/2);
+      ctx.restore();
+    }
 
     // Vignette
     const vg = ctx.createRadialGradient(w/2, h/2, h*0.2, w/2, h/2, h*0.72);
@@ -964,11 +1429,19 @@ class WorldMap {
     vg.addColorStop(1, 'rgba(0,0,0,0.5)');
     ctx.fillStyle = vg;
     ctx.fillRect(0, 0, w, h);
+
+    // Minimap
+    drawMinimap(ctx, w, h, this.camX, this.camY, this.cssW, this.cssH,
+                this.map, this.player, this.enemies);
+
+    // HUD keys
+    drawHudKeys(ctx, w, h, this._keys);
   }
 
   _clampCamera() {
-    const visX = this.cssW / TS;
-    const visY = this.cssH / TS;
+    const ts  = TS * RS;
+    const visX = this.cssW / ts;
+    const visY = this.cssH / ts;
     this.targetCamX = Math.max(0, Math.min(MW - visX, this.targetCamX));
     this.targetCamY = Math.max(0, Math.min(MH - visY, this.targetCamY));
   }
@@ -994,8 +1467,8 @@ class WorldMap {
     });
     window.addEventListener('mousemove', e => {
       if (!this.drag) return;
-      this.targetCamX = this.camDragX - (e.clientX - this.dragX) / TS;
-      this.targetCamY = this.camDragY - (e.clientY - this.dragY) / TS;
+      this.targetCamX = this.camDragX - (e.clientX - this.dragX) / (TS * RS);
+      this.targetCamY = this.camDragY - (e.clientY - this.dragY) / (TS * RS);
       this._clampCamera();
     });
     window.addEventListener('mouseup', e => {
@@ -1016,8 +1489,8 @@ class WorldMap {
       e.preventDefault();
       if (!this.drag) return;
       const t = e.touches[0];
-      this.targetCamX = this.camDragX - (t.clientX - this.dragX) / TS;
-      this.targetCamY = this.camDragY - (t.clientY - this.dragY) / TS;
+      this.targetCamX = this.camDragX - (t.clientX - this.dragX) / (TS * RS);
+      this.targetCamY = this.camDragY - (t.clientY - this.dragY) / (TS * RS);
       this._clampCamera();
     }, { passive: false });
     c.addEventListener('touchend', e => {
@@ -1030,8 +1503,9 @@ class WorldMap {
 
   _handleClick(clientX, clientY) {
     const rect = this.canvas.getBoundingClientRect();
-    const tx = (clientX - rect.left) / TS + this.camX;
-    const ty = (clientY - rect.top)  / TS + this.camY;
+    const ts = TS * RS;
+    const tx = (clientX - rect.left) / ts + this.camX;
+    const ty = (clientY - rect.top)  / ts + this.camY;
     for (const zone of ZONES) {
       if (Math.abs(tx - zone.cx) <= zone.rw && Math.abs(ty - zone.cy) <= zone.rh) {
         this.onZoneClick(zone.id, zone.locked);
@@ -1043,8 +1517,8 @@ class WorldMap {
   panToZone(zoneId) {
     const zone = ZONES.find(z => z.id === zoneId);
     if (!zone) return;
-    this.targetCamX = zone.cx - this.cssW / TS / 2;
-    this.targetCamY = zone.cy - this.cssH / TS / 2;
+    this.targetCamX = zone.cx - this.cssW / (TS * RS) / 2;
+    this.targetCamY = zone.cy - this.cssH / (TS * RS) / 2;
     this._clampCamera();
   }
 
